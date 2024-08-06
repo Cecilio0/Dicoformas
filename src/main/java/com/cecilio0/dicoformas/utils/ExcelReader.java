@@ -18,7 +18,7 @@ public final class ExcelReader {
 		FileInputStream fis = new FileInputStream(file);
 		
 		Workbook workbook;
-		if(arr[arr.length-1].equalsIgnoreCase("xls")){
+		if(arr[arr.length-1].equalsIgnoreCase("xls")) {
 			workbook = new HSSFWorkbook(fis);
 		} else if (arr[arr.length-1].equalsIgnoreCase("xlsx")) {
 			workbook = new XSSFWorkbook(fis);

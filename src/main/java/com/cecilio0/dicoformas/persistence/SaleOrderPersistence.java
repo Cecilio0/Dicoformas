@@ -11,6 +11,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 @NoArgsConstructor
@@ -59,9 +60,10 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 //			System.out.println(currentRow.getCell(keyPositions.get("FECHA")).getStringCellValue());
 			SaleOrderModel saleOrder;
 			if((saleOrder = saleOrders.get(orderCode)) == null){
+				long date = (long) currentRow.getCell(keyPositions.get("FECHA")).getNumericCellValue();
 				saleOrder = SaleOrderModel.builder()
 						.code(orderCode)
-						.orderPlacedDate(new Date((long) currentRow.getCell(keyPositions.get("FECHA")).getNumericCellValue())) // todo Check out java.Time class, plus it is not working correctly
+						.orderPlacedDate(LocalDate.ofEpochDay(date-25569))
 						.isInvoiced(false) // todo Check how to get this information from excel file
 						.products(new ArrayList<>())
 						.build();
