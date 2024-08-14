@@ -4,12 +4,14 @@ import com.cecilio0.dicoformas.persistence.ISaleOrderPersistence;
 import com.cecilio0.dicoformas.persistence.SaleOrderPersistence;
 import com.cecilio0.dicoformas.services.SaleOrderService;
 import com.cecilio0.dicoformas.utils.FileType;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class SaleOrderController {
 	
+	@Getter
 	private final SaleOrderService saleOrderService;
 	
 	private static SaleOrderController instance;
@@ -29,15 +31,21 @@ public class SaleOrderController {
 		return instance = new SaleOrderController(saleOrderPersistence);
 	}
 	
-	public void loadSaleOrder(String fileRoute, FileType fileType) throws IOException {
+	public void loadSaleOrder(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		saleOrderService.loadSaleOrders(fileRoute, fileType);
 	}
-	public void saveSaleOrders(String fileRoute, FileType fileType) {
+	public void saveSaleOrders(String fileRoute, FileType fileType) throws IOException {
 		saleOrderService.saveSaleOrders(Objects.requireNonNullElse(fileRoute, "saleOrders.dat"), fileType);
 	}
 	public void showSaleOrders() {
 		saleOrderService.getSaleOrders().forEach((number,sale) -> {
-			System.out.println(sale.getCode() + ": " + sale.getOrderPlacedDate());
+			System.out.println(sale.getCode() + ": ");
+			System.out.println("\t" + sale.getOrderPlacedDate());
+			System.out.println("\tProduct orders: ");
+			sale.getProductOrders().forEach((productOrder) -> {
+				System.out.println("\t\t" + productOrder.getProduct().getName() + ": " + productOrder.getAmount());
+			});
+			System.out.println();
 		});
 	}
 	

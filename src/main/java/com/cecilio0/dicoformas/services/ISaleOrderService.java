@@ -8,11 +8,11 @@ import java.util.Map;
 
 public interface ISaleOrderService {
 	
-	void saveSaleOrders(String fileRoute, FileType fileType);
+	void saveSaleOrders(String fileRoute, FileType fileType) throws IOException;
 	
 	void updateSaleOrders(String fileRoute) throws IOException;
 	
-	void loadSaleOrders(String fileRoute, FileType fileType) throws IOException;
+	void loadSaleOrders(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException;
 	
 	Map<Integer, SaleOrderModel> getSaleOrders();
 }

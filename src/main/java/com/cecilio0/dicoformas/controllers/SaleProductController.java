@@ -31,10 +31,10 @@ public class SaleProductController {
 		return instance = new SaleProductController(saleProductPersistence);
 	}
 	
-	public void loadSaleProducts(String fileRoute, FileType fileType) throws IOException {
+	public void loadSaleProducts(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		saleProductService.loadProducts(fileRoute, fileType);
 	}
-	public void saveSaleProducts(String fileRoute, FileType fileType) {
+	public void saveSaleProducts(String fileRoute, FileType fileType) throws IOException {
 		saleProductService.saveProducts(Objects.requireNonNullElse(fileRoute, "saleProducts.dat"), fileType);
 	}
 	public void showSaleProducts() {

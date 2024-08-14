@@ -59,11 +59,11 @@ public interface IProductPersistence {
 		return products;
 	}
 	
-	default Map<Integer, ProductModel> loadProductsFromDatFile(String fileRoute){
+	default Map<Integer, ProductModel> loadProductsFromDatFile(String fileRoute) throws IOException, ClassNotFoundException {
 		return (Map<Integer, ProductModel>) DatUtil.readObjectFromFile(fileRoute);
 	}
 	
-	default void saveProductsToDatFile(Map<Integer, ProductModel> products, String fileRoute){
+	default void saveProductsToDatFile(Map<Integer, ProductModel> products, String fileRoute) throws IOException {
 		DatUtil.writeObjectToFile(products, fileRoute);
 	}
 	

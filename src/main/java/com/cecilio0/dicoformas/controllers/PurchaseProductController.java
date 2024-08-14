@@ -28,14 +28,13 @@ public class PurchaseProductController {
 		return instance = new PurchaseProductController(purchaseProductPersistence);
 	}
 	
-	public void loadPurchaseProducts(String fileRoute, FileType fileType) throws IOException {
+	public void loadPurchaseProducts(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		purchaseProductService.loadProducts(fileRoute, fileType);
 	}
-	public void savePurchaseProducts(String fileRoute, FileType fileType) {
+	public void savePurchaseProducts(String fileRoute, FileType fileType) throws IOException {
 		purchaseProductService.saveProducts(Objects.requireNonNullElse(fileRoute, "purchaseProducts.dat"), fileType);
 	}
-	public void showPurchaseProducts(String excelRoute) throws IOException {
-		purchaseProductService.updateProducts(excelRoute);
+	public void showPurchaseProducts() throws IOException {
 		purchaseProductService.getProducts().forEach((number,product) -> {
 			System.out.println(product.getCode() + ": " + product.getName());
 		});

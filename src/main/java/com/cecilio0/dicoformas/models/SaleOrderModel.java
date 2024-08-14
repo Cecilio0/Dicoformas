@@ -14,7 +14,7 @@ public class SaleOrderModel implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 3L;
 	private Integer code;
-	private List<ProductOrder> products; // Each productOrder has an integer corresponding to the amount of the product bought
+	private List<ProductOrder> productOrders; // Each productOrder has an integer corresponding to the amount of the product bought
 	private LocalDate orderPlacedDate;
 	private boolean isInvoiced;
 }

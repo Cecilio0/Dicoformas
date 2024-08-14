@@ -37,7 +37,7 @@ public class SaleOrderService implements ISaleOrderService{
 	}
 	
 	@Override
-	public void saveSaleOrders(String fileRoute, FileType fileType) {
+	public void saveSaleOrders(String fileRoute, FileType fileType) throws IOException {
 		if(fileType == FileType.EXCEL)
 			saleOrderPersistence.saveSaleOrdersToExcelFile(saleOrders, fileRoute);
 		else
@@ -45,7 +45,7 @@ public class SaleOrderService implements ISaleOrderService{
 	}
 	
 	@Override
-	public void loadSaleOrders(String fileRoute, FileType fileType) throws IOException {
+	public void loadSaleOrders(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		Map<Integer, SaleOrderModel> toUpdate;
 		
 		if(fileType == FileType.EXCEL)

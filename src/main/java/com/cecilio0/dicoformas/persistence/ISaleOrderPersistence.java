@@ -10,9 +10,9 @@ public interface ISaleOrderPersistence {
 	
 	Map<Integer, SaleOrderModel> loadSaleOrdersFromExcelFile(String fileRoute, Map<Integer, ProductModel> products) throws IOException;
 	
-	Map<Integer, SaleOrderModel> loadSaleOrdersFromDatFile(String fileRoute);
+	Map<Integer, SaleOrderModel> loadSaleOrdersFromDatFile(String fileRoute) throws IOException, ClassNotFoundException;
 	
-	void saveSaleOrdersToDatFile(Map<Integer, SaleOrderModel> saleOrders, String fileRoute);
+	void saveSaleOrdersToDatFile(Map<Integer, SaleOrderModel> saleOrders, String fileRoute) throws IOException;
 	
 	void saveSaleOrdersToExcelFile(Map<Integer, SaleOrderModel> saleOrders, String fileRoute);
 }

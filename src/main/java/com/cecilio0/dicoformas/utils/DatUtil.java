@@ -2,23 +2,16 @@ package com.cecilio0.dicoformas.utils;
 
 import java.io.*;
 
-public class DatUtil {
-	public static void writeObjectToFile(Object obj, String filename) {
-		try (FileOutputStream fileOut = new FileOutputStream(filename);
-			 ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-			out.writeObject(obj);
-		} catch (IOException i) {
-			i.printStackTrace();
-		}
+public final class DatUtil {
+	public static void writeObjectToFile(Object obj, String filename) throws IOException {
+		FileOutputStream fileOut = new FileOutputStream(filename);
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(obj);
 	}
 	
-	public static Object readObjectFromFile(String filename) {
-		try (FileInputStream fileIn = new FileInputStream(filename);
-			 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-			return in.readObject();
-		} catch (IOException | ClassNotFoundException i) {
-			i.printStackTrace();
-			return null;
-		}
+	public static Object readObjectFromFile(String filename) throws IOException, ClassNotFoundException {
+		FileInputStream fileIn = new FileInputStream(filename);
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		return in.readObject();
 	}
 }

@@ -65,7 +65,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 						.code(orderCode)
 						.orderPlacedDate(LocalDate.ofEpochDay(date-25569))
 						.isInvoiced(false) // todo Check how to get this information from excel file
-						.products(new ArrayList<>())
+						.productOrders(new ArrayList<>())
 						.build();
 			}
 			
@@ -96,12 +96,12 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 							.build());
 				}
 				
-				saleOrder.getProducts()
+				saleOrder.getProductOrders()
 						.add(new ProductOrder(
 								products.get(productCode),
 								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
 			} else {
-				saleOrder.getProducts()
+				saleOrder.getProductOrders()
 						.add(new ProductOrder(
 								ProductModel.builder()
 										.type(ProductType.SALE)
@@ -121,13 +121,13 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 	
 	// todo Complete this implementation
 	@Override
-	public Map<Integer, SaleOrderModel> loadSaleOrdersFromDatFile(String fileRoute) {
+	public Map<Integer, SaleOrderModel> loadSaleOrdersFromDatFile(String fileRoute) throws IOException, ClassNotFoundException {
 		return (Map<Integer, SaleOrderModel>) DatUtil.readObjectFromFile(fileRoute);
 	}
 	
 	// todo Complete this implementation
 	@Override
-	public void saveSaleOrdersToDatFile(Map<Integer, SaleOrderModel> saleOrders, String fileRoute) {
+	public void saveSaleOrdersToDatFile(Map<Integer, SaleOrderModel> saleOrders, String fileRoute) throws IOException {
 		DatUtil.writeObjectToFile(saleOrders, fileRoute);
 	}
 	

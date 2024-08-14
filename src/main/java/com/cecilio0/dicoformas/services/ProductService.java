@@ -19,7 +19,7 @@ public class ProductService implements IProductService {
 	}
 	
 	@Override
-	public void saveProducts(String fileRoute, FileType fileType) {
+	public void saveProducts(String fileRoute, FileType fileType) throws IOException {
 		if (fileType == FileType.EXCEL)
 			productPersistence.saveProductsToExcelFile(products, fileRoute);
 		else
@@ -37,7 +37,7 @@ public class ProductService implements IProductService {
 	}
 	
 	@Override
-	public void loadProducts(String fileRoute, FileType fileType) throws IOException {
+	public void loadProducts(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		Map<Integer, ProductModel> toUpdate;
 		
 		if(fileType == FileType.EXCEL)

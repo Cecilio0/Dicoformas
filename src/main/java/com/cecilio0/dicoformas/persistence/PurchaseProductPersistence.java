@@ -19,6 +19,7 @@ public class PurchaseProductPersistence implements IProductPersistence {
 		if(firstSheet == null) {
 			firstSheet = workbook.getSheetAt(0);
 		}
+		
 		return firstSheet;
 	}
 	
