@@ -1,0 +1,26 @@
+<dialogs>
+    <!-- Dialogs for the main window -->
+    <!-- TODO: fill all of these out -->
+    <window>
+        <title>Dicoformas</title>
+        <width>800</width>
+        <height>600</height>
+    </window>
+    <sidebar>
+        <buttons>
+            <home>
+                <text>Inicio</text>
+                <icon>icons/homeIcon.jpg</icon>
+            </home>
+            <statistics>
+                <text>Estadísticas</text>
+                <icon>icons/statisticsIcon.jpg</icon>
+            </statistics>
+            <settings>
+                <text>Configuración</text>
+                <icon>icons/settingsIcon.jpg</icon>
+            </settings>
+        </buttons>
+        <width>200</width>
+    </sidebar>
+</dialogs>

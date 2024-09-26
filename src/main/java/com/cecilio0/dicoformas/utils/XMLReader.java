@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class XMLReader {
-	public static Element readXML(String fileRoute, String tagName) throws ParserConfigurationException, IOException, SAXException {
+	public static Element readXML(String fileRoute) throws ParserConfigurationException, IOException, SAXException {
 		
 		// Load the XML file from resources
 		File xmlFile = new File(XMLReader.class.getClassLoader()
@@ -26,16 +26,6 @@ public class XMLReader {
 		
 		// Parse the XML file and load it into a Document
 		Document doc = dBuilder.parse(xmlFile);
-		doc.getDocumentElement().normalize();
-		
-		// Get a list of all elements in the XML
-		NodeList nList = doc.getElementsByTagName(tagName);
-		
-		// Return the first element
-		System.out.println(nList.getLength());
-		return (Element) nList.item(0);
-		
-		//Read elements by doing:
-		//node.getElementsByTagName("tagName").item(0).getTextContent();
+		return doc.getDocumentElement();
 	}
 }
