@@ -4,6 +4,7 @@ import com.cecilio0.dicoformas.services.IProductService;
 import com.cecilio0.dicoformas.utils.FileType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
@@ -55,12 +56,26 @@ public class MainWindowController {
 			File file = fileChooser.showOpenDialog(null);
 			if (file != null) {
 				purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+				
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Carga de productos de MP");
+				alert.setHeaderText(null);
+				alert.setContentText("Productos de MP cargados correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " productos.");
+				
+				alert.showAndWait();
+			} else {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al cargar productos de MP");
+				alert.setHeaderText(null);
+				alert.setContentText("No se ha seleccionado ningún archivo.");
+				
+				alert.showAndWait();
 			}
-			
-			label.setText("Productos de MP cargados correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " productos.");
-			
 		} catch (Exception e) {
-			e.printStackTrace();
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Error al cargar productos de MP");
+			alert.setHeaderText(null);
+			alert.setContentText(e.getMessage());
 		}
 	}
 	
