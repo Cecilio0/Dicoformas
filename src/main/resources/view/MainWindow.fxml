@@ -48,10 +48,10 @@
         <Menu mnemonicParsing="false" text="Archivo">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#loadPurchaseProducts" text="Cargar MP" />
-            <MenuItem mnemonicParsing="false" text="Cargar Compras MP" />
+            <MenuItem mnemonicParsing="false" onAction="#loadPurchaseOrders" text="Cargar Compras MP" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Cargar PT" />
-            <MenuItem mnemonicParsing="false" text="Cargar Pedidos PT" />
+            <MenuItem mnemonicParsing="false" onAction="#loadSaleProducts" text="Cargar PT" />
+            <MenuItem mnemonicParsing="false" onAction="#loadSaleOrders" text="Cargar Pedidos PT" />
                   <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Salir" />
           </items>
