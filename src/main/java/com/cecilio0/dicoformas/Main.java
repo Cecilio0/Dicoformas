@@ -22,7 +22,7 @@ public class Main extends Application {
 		controller.setPurchaseProductService(PurchaseProductController.getInstance().getPurchaseProductService());
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("JavaFX Application");
+		primaryStage.setTitle("DicoStat");
 		primaryStage.show();
 	}
 	

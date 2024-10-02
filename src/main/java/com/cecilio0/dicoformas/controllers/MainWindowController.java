@@ -6,9 +6,9 @@ import com.cecilio0.dicoformas.utils.FileType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -25,7 +25,7 @@ public class MainWindowController {
 	private ISaleOrderService saleOrderService;
 	
 	@FXML
-	private Label label;
+	private LineChart<Number, Number> lineChart;
 	
 	////////////////////////////// SERVICES //////////////////////////////
 	public void setPurchaseProductService(IProductService service) {
@@ -47,7 +47,7 @@ public class MainWindowController {
 	
 	////////////////////////////// MENU  //////////////////////////////
 	
-	//////////////// MENU - ARCHIVO //////////////////\
+	//////////////// MENU - ARCHIVO //////////////////
 	
 	@FXML
 	private void loadPurchaseProducts(ActionEvent event) {
@@ -67,17 +67,19 @@ public class MainWindowController {
 			}
 			
 			File file = fileChooser.showOpenDialog(null);
+			
+			Alert alert;
 			if (file != null) {
 				purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
 				
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de productos de MP");
 				alert.setHeaderText(null);
 				alert.setContentText("Productos de MP cargados correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " productos.");
 				
 				alert.showAndWait();
 			} else {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar productos de MP");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
@@ -110,23 +112,23 @@ public class MainWindowController {
 			}
 			
 			File file = fileChooser.showOpenDialog(null);
+			Alert alert;
 			if (file != null) {
 				// purchaseOrderService.loadPurchaseOrders(file.getAbsolutePath(), FileType.EXCEL);
 				
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de compras");
 				alert.setHeaderText(null);
 				alert.setContentText("Compras cargadas correctamente.");
 				
-				alert.showAndWait();
 			} else {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar compras");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
 				
-				alert.showAndWait();
 			}
+			alert.showAndWait();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar compras");
@@ -153,17 +155,19 @@ public class MainWindowController {
 			}
 			
 			File file = fileChooser.showOpenDialog(null);
+			
+			Alert alert;
 			if (file != null) {
 				saleProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
 				
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de productos de PT");
 				alert.setHeaderText(null);
 				alert.setContentText("Productos de PT cargados correctamente. Se cargaron " + saleProductService.getProducts().size() + " productos.");
 				
 				alert.showAndWait();
 			} else {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar productos de PT");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
@@ -196,17 +200,19 @@ public class MainWindowController {
 			}
 			
 			File file = fileChooser.showOpenDialog(null);
+			
+			Alert alert;
 			if (file != null) {
 				saleOrderService.loadSaleOrders(file.getAbsolutePath(), FileType.EXCEL);
 				
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de pedidos");
 				alert.setHeaderText(null);
 				alert.setContentText("Pedidos cargados correctamente. Se cargaron " + saleOrderService.getSaleOrders().size() + " pedidos.");
 				
 				alert.showAndWait();
 			} else {
-				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar pedidos");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
@@ -240,4 +246,44 @@ public class MainWindowController {
 	}
 	
 	////////////////////////////// CONTENT //////////////////////////////
+	
+	// Method to create and display the LineChart
+	private void displayLineChart() {
+		// Clear any existing data in the chart
+		lineChart.getData().clear();
+		
+		lineChart.getXAxis().setLabel("Months");
+		lineChart.getYAxis().setLabel("Orders");
+		
+		// Create the first dataset for Sales Orders
+		XYChart.Series<Number, Number> salesOrdersSeries = new XYChart.Series<>();
+		salesOrdersSeries.setName("Sales Orders");
+		
+		// Mock data for Sales Orders
+		salesOrdersSeries.getData().add(new XYChart.Data<>(1, 50));
+		salesOrdersSeries.getData().add(new XYChart.Data<>(2, 80));
+		salesOrdersSeries.getData().add(new XYChart.Data<>(3, 45));
+		salesOrdersSeries.getData().add(new XYChart.Data<>(4, 90));
+		salesOrdersSeries.getData().add(new XYChart.Data<>(5, 60));
+		
+		// Create the second dataset for Purchase Orders
+		XYChart.Series<Number, Number> purchaseOrdersSeries = new XYChart.Series<>();
+		purchaseOrdersSeries.setName("Purchase Orders");
+		
+		// Mock data for Purchase Orders
+		purchaseOrdersSeries.getData().add(new XYChart.Data<>(1, 30));
+		purchaseOrdersSeries.getData().add(new XYChart.Data<>(2, 60));
+		purchaseOrdersSeries.getData().add(new XYChart.Data<>(3, 35));
+		purchaseOrdersSeries.getData().add(new XYChart.Data<>(4, 70));
+		purchaseOrdersSeries.getData().add(new XYChart.Data<>(5, 55));
+		
+		// Add both datasets to the existing LineChart
+		lineChart.getData().addAll(salesOrdersSeries, purchaseOrdersSeries);
+	}
+	
+	
+	@FXML
+	private void showChart(ActionEvent event) {
+		displayLineChart();  // This will show the chart when the button is clicked
+	}
 }
