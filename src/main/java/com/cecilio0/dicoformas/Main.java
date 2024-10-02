@@ -13,12 +13,13 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainPage.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainWindow.fxml"));
 		Scene scene = new Scene(loader.load());
 		
 		// Get controller instance and inject the service
-		MainPageController controller = loader.getController();
-		controller.setService(SaleProductController.getInstance().getSaleProductService());
+		MainWindowController controller = loader.getController();
+		controller.setSaleProductService(SaleProductController.getInstance().getSaleProductService());
+		controller.setPurchaseProductService(PurchaseProductController.getInstance().getPurchaseProductService());
 		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("JavaFX Application");

@@ -28,6 +28,10 @@ public class PurchaseProductController {
 		return instance = new PurchaseProductController(purchaseProductPersistence);
 	}
 	
+	public IProductService getPurchaseProductService() {
+		return purchaseProductService;
+	}
+	
 	public void loadPurchaseProducts(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		purchaseProductService.loadProducts(fileRoute, fileType);
 	}
