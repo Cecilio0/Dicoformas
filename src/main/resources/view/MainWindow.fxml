@@ -32,7 +32,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
@@ -40,10 +39,10 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cecilio0.dicoformas.controllers.MainWindowController">
+<VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cecilio0.dicoformas.controllers.MainWindowController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -65,22 +64,20 @@
         </Menu>
       </menus>
     </MenuBar>
-    <AnchorPane fx:id="content" maxHeight="-1.0" maxWidth="-1.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
-      <children>
-            <VBox alignment="CENTER" layoutX="70.0">
-               <children>
-                  <LineChart fx:id="lineChart">
-                    <xAxis>
-                      <NumberAxis side="BOTTOM" fx:id="xAxis" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis fx:id="yAxis" side="LEFT" />
-                    </yAxis>
-                  </LineChart>
-                  <Button mnemonicParsing="false" onAction="#showChart" text="Button" />
-               </children>
-            </VBox>
-      </children>
-    </AnchorPane>
+      <BorderPane>
+         <center>
+            <LineChart fx:id="lineChart" BorderPane.alignment="CENTER">
+              <xAxis>
+                <NumberAxis side="BOTTOM" fx:id="xAxis" />
+              </xAxis>
+              <yAxis>
+                <NumberAxis fx:id="yAxis" side="LEFT" />
+              </yAxis>
+            </LineChart>
+         </center>
+         <bottom>
+            <Button mnemonicParsing="false" onAction="#showChart" text="Button" textAlignment="CENTER" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
   </children>
 </VBox>

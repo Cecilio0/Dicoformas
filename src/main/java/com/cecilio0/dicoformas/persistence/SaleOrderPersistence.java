@@ -33,6 +33,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 		keys.add("DETALLE"); // In case the product has code 1200
 		keys.add("CANTIDAD"); // How many of the product were bought
 		keys.add("VALOR"); // Price of the product being detailed
+		keys.add("FACTURA"); // Invoice of the order
 		
 		// Get the position for each key inside the workbook
 		Map<String, Integer> keyPositions = new HashMap<>();
@@ -57,19 +58,18 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 				!Objects.equals((currentRow = rowIterator.next()).getCell(keyPositions.get("PEDIDO")).getStringCellValue(), "")){
 			
 			Integer orderCode = Integer.parseInt(currentRow.getCell(keyPositions.get("PEDIDO")).getStringCellValue().trim());
-//			System.out.println(currentRow.getCell(keyPositions.get("FECHA")).getStringCellValue());
 			SaleOrderModel saleOrder;
 			if((saleOrder = saleOrders.get(orderCode)) == null){
 				long date = (long) currentRow.getCell(keyPositions.get("FECHA")).getNumericCellValue();
 				saleOrder = SaleOrderModel.builder()
 						.code(orderCode)
 						.orderPlacedDate(LocalDate.ofEpochDay(date-25569))
-						.isInvoiced(false) // todo Check how to get this information from excel file
+						.invoice((int) currentRow.getCell(keyPositions.get("FACTURA")).getNumericCellValue()) // todo Check how to get this information from excel file
 						.productOrders(new ArrayList<>())
 						.build();
 			}
 			
-			// todo Ask wtf is a "FLETE", this is a temporary workaround
+			// "FLETES" are products built by a different company, so they are not registered in the system
 			if(currentRow.getCell(keyPositions.get("CODIGO")).getStringCellValue().trim().equals("FLETES"))
 				continue;
 			
@@ -77,7 +77,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 			
 			String detail = currentRow.getCell(keyPositions.get("DETALLE")).getStringCellValue().trim();
 			double weightKG = 0;
-			// todo Implement exception for no parenthesis found
+			// todo Implement exception for no parenthesis found, not sure if this actually has to be done
 			if(detail.indexOf('(') != -1 && detail.indexOf(')') != -1){
 				String substring = detail.substring(detail.lastIndexOf('('), detail.lastIndexOf(')'));
 				if(NumberUtils.isCreatable(substring))
@@ -119,13 +119,11 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 		return saleOrders;
 	}
 	
-	// todo Complete this implementation
 	@Override
 	public Map<Integer, SaleOrderModel> loadSaleOrdersFromDatFile(String fileRoute) throws IOException, ClassNotFoundException {
 		return (Map<Integer, SaleOrderModel>) DatUtil.readObjectFromFile(fileRoute);
 	}
 	
-	// todo Complete this implementation
 	@Override
 	public void saveSaleOrdersToDatFile(Map<Integer, SaleOrderModel> saleOrders, String fileRoute) throws IOException {
 		DatUtil.writeObjectToFile(saleOrders, fileRoute);
