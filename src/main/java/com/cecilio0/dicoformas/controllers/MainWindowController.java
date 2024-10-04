@@ -1,6 +1,7 @@
 package com.cecilio0.dicoformas.controllers;
 
 import com.cecilio0.dicoformas.services.IProductService;
+import com.cecilio0.dicoformas.services.IPurchaseOrderService;
 import com.cecilio0.dicoformas.services.ISaleOrderService;
 import com.cecilio0.dicoformas.utils.FileType;
 import javafx.event.ActionEvent;
@@ -18,7 +19,7 @@ public class MainWindowController {
 	
 	private IProductService purchaseProductService;
 	
-//	private IPurchaseOrderService purchaseOrderService;
+	private IPurchaseOrderService purchaseOrderService;
 	
 	private IProductService saleProductService;
 	
@@ -32,9 +33,9 @@ public class MainWindowController {
 		this.purchaseProductService = service;
 	}
 	
-//	public void setPurchaseOrderService(IPurchaseOrderService service) {
-//		this.purchaseOrderService = service;
-//	}
+	public void setPurchaseOrderService(IPurchaseOrderService service) {
+		this.purchaseOrderService = service;
+	}
 	
 	public void setSaleProductService(IProductService service) {
 		this.saleProductService = service;
@@ -114,12 +115,12 @@ public class MainWindowController {
 			File file = fileChooser.showOpenDialog(null);
 			Alert alert;
 			if (file != null) {
-				// purchaseOrderService.loadPurchaseOrders(file.getAbsolutePath(), FileType.EXCEL);
+				 purchaseOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de compras");
 				alert.setHeaderText(null);
-				alert.setContentText("Compras cargadas correctamente.");
+				alert.setContentText("Compras cargadas correctamente. Se cargaron " + purchaseOrderService.getOrders().size() + " compras.");
 				
 			} else {
 				alert = new Alert(Alert.AlertType.ERROR);

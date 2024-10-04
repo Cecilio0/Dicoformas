@@ -51,7 +51,7 @@ public interface IProductPersistence {
 							.code(code)
 							.name(currentRow.getCell(keyPositions.get(keys.get(1))).getStringCellValue())
 							.price(currentRow.getCell(keyPositions.get(keys.get(2))).getNumericCellValue())
-//							.weightKG(currentRow.getCell(keyPositions.get(keys.get(3))).getNumericCellValue()) // todo add this, eventually
+							.weightKG(currentRow.getCell(keyPositions.get(keys.get(3))).getNumericCellValue())
 							.type(ProductType.SALE)
 							.build());
 		}

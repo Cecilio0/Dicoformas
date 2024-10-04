@@ -1,7 +1,6 @@
 package com.cecilio0.dicoformas.controllers;
 
 import com.cecilio0.dicoformas.services.IStatisticsService;
-import com.cecilio0.dicoformas.services.SaleOrderService;
 import com.cecilio0.dicoformas.services.StatisticsService;
 
 public class StatisticsController {
@@ -12,7 +11,10 @@ public class StatisticsController {
 	
 	private StatisticsController() {
 		this.statisticsService = new StatisticsService(
-				SaleOrderController.getInstance().getSaleOrderService());
+				SaleOrderController.getInstance().getSaleOrderService(),
+				SaleProductController.getInstance().getSaleProductService(),
+				PurchaseOrderController.getInstance().getPurchaseOrderService(),
+				PurchaseProductController.getInstance().getPurchaseProductService());
 	}
 	
 	public static StatisticsController getInstance() {
@@ -20,5 +22,9 @@ public class StatisticsController {
 			return instance;
 		
 		return instance = new StatisticsController();
+	}
+	
+	public IStatisticsService getStatisticsService() {
+		return statisticsService;
 	}
 }
