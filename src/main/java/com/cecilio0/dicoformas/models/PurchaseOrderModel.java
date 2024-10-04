@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-// todo Do this with one order class if possible without issues
 @Data
 @Builder
 public class PurchaseOrderModel implements Serializable {

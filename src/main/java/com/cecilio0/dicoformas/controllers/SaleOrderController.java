@@ -32,13 +32,13 @@ public class SaleOrderController {
 	}
 	
 	public void loadSaleOrder(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
-		saleOrderService.loadSaleOrders(fileRoute, fileType);
+		saleOrderService.loadOrders(fileRoute, fileType);
 	}
 	public void saveSaleOrders(String fileRoute, FileType fileType) throws IOException {
-		saleOrderService.saveSaleOrders(Objects.requireNonNullElse(fileRoute, "saleOrders.dat"), fileType);
+		saleOrderService.saveOrders(Objects.requireNonNullElse(fileRoute, "saleOrders.dat"), fileType);
 	}
 	public void showSaleOrders() {
-		saleOrderService.getSaleOrders().forEach((number,sale) -> {
+		saleOrderService.getOrders().forEach((number,sale) -> {
 			System.out.println(sale.getCode() + ": ");
 			System.out.println("\t" + sale.getOrderPlacedDate());
 			System.out.println("\tProduct orders: ");

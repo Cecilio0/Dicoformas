@@ -1,10 +1,10 @@
 package com.cecilio0.dicoformas;
 
 import com.cecilio0.dicoformas.controllers.*;
-import com.cecilio0.dicoformas.models.ProductModel;
 import com.cecilio0.dicoformas.persistence.IPurchaseOrderPersistence;
 import com.cecilio0.dicoformas.persistence.PurchaseOrderPersistence;
-import com.cecilio0.dicoformas.persistence.PurchaseProductPersistence;
+import com.cecilio0.dicoformas.services.IPurchaseOrderService;
+import com.cecilio0.dicoformas.services.PurchaseOrderService;
 import com.cecilio0.dicoformas.utils.FileType;
 import com.cecilio0.dicoformas.utils.XMLReader;
 import javafx.application.Application;
@@ -12,8 +12,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.w3c.dom.Element;
-
-import java.util.HashMap;
 
 public class Main extends Application {
 	
@@ -52,8 +50,10 @@ public class Main extends Application {
 //			saleOrderController.saveSaleOrders("./../saleOrders.dat", FileType.DAT);
 			
 			IPurchaseOrderPersistence purchaseOrderPersistence = new PurchaseOrderPersistence();
-			purchaseOrderPersistence.loadPurchaseOrdersFromExcelFile("C:/Users/drone/Documents/Work/new data/Detalle de Compras MP.xlsx", new HashMap<Integer, ProductModel>());
+			IPurchaseOrderService purchaseOrderService = new PurchaseOrderService(purchaseOrderPersistence, purchaseProductController.getPurchaseProductService());
+			purchaseOrderService.loadOrders("C:/Users/drone/Documents/Work/new data/Detalle de Compras MP.xlsx", FileType.EXCEL);
 
+			
 			StatisticsController statisticsController = StatisticsController.getInstance();
 //			statisticsController.showStatistics();
 

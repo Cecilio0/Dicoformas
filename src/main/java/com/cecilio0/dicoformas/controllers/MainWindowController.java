@@ -203,12 +203,12 @@ public class MainWindowController {
 			
 			Alert alert;
 			if (file != null) {
-				saleOrderService.loadSaleOrders(file.getAbsolutePath(), FileType.EXCEL);
+				saleOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de pedidos");
 				alert.setHeaderText(null);
-				alert.setContentText("Pedidos cargados correctamente. Se cargaron " + saleOrderService.getSaleOrders().size() + " pedidos.");
+				alert.setContentText("Pedidos cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
 				
 				alert.showAndWait();
 			} else {

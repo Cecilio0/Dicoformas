@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // todo Do this
-public class SaleOrderService implements ISaleOrderService{
+public class SaleOrderService implements ISaleOrderService {
 	
 	private final ISaleOrderPersistence saleOrderPersistence;
 	private final IProductService saleProductService;
@@ -23,12 +23,12 @@ public class SaleOrderService implements ISaleOrderService{
 	}
 	
 	@Override
-	public Map<Integer, SaleOrderModel> getSaleOrders() {
+	public Map<Integer, SaleOrderModel> getOrders() {
 		return saleOrders;
 	}
 	
 	@Override
-	public void updateSaleOrders(String fileRoute) throws IOException {
+	public void updateOrders(String fileRoute) throws IOException {
 		Map<Integer, SaleOrderModel> toUpdate = saleOrderPersistence.loadSaleOrdersFromExcelFile(fileRoute, saleProductService.getProducts());
 		
 		for (Integer key : toUpdate.keySet()) {
@@ -37,7 +37,7 @@ public class SaleOrderService implements ISaleOrderService{
 	}
 	
 	@Override
-	public void saveSaleOrders(String fileRoute, FileType fileType) throws IOException {
+	public void saveOrders(String fileRoute, FileType fileType) throws IOException {
 		if(fileType == FileType.EXCEL)
 			saleOrderPersistence.saveSaleOrdersToExcelFile(saleOrders, fileRoute);
 		else
@@ -45,7 +45,7 @@ public class SaleOrderService implements ISaleOrderService{
 	}
 	
 	@Override
-	public void loadSaleOrders(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
+	public void loadOrders(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		Map<Integer, SaleOrderModel> toUpdate;
 		
 		if(fileType == FileType.EXCEL)
