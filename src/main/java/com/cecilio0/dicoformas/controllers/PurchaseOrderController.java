@@ -31,20 +31,18 @@ public class PurchaseOrderController {
 		return instance = new PurchaseOrderController(purchaseOrderPersistence);
 	}
 	
-	public void loadSaleOrder(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
+	public void loadPurchaseOrder(String fileRoute, FileType fileType) throws IOException, ClassNotFoundException {
 		purchaseOrderService.loadOrders(fileRoute, fileType);
 	}
-	public void saveSaleOrders(String fileRoute, FileType fileType) throws IOException {
+	public void savePurchaseOrders(String fileRoute, FileType fileType) throws IOException {
 		purchaseOrderService.saveOrders(Objects.requireNonNullElse(fileRoute, "saleOrders.dat"), fileType);
 	}
-	public void showSaleOrders() {
+	public void showPurchaseOrders() {
 		purchaseOrderService.getOrders().forEach((number,sale) -> {
 			System.out.println(sale.getCode() + ": ");
 			System.out.println("\t" + sale.getOrderPlacedDate());
 			System.out.println("\tProduct orders: ");
-			sale.getProductOrders().forEach((productOrder) -> {
-				System.out.println("\t\t" + productOrder.getProduct().getName() + ": " + productOrder.getAmount());
-			});
+			sale.getProductOrders().forEach((productOrder) -> System.out.println("\t\t" + productOrder.getProduct().getName() + ": " + productOrder.getAmount()));
 			System.out.println();
 		});
 	}

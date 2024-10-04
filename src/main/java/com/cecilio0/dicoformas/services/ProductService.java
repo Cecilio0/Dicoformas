@@ -31,6 +31,9 @@ public class ProductService implements IProductService {
 	public void updateProducts(String fileRoute) throws IOException {
 		Map<Integer, ProductModel> toUpdate = productPersistence.loadProductsFromExcelFile(fileRoute);
 		
+		if (toUpdate == null)
+			return;
+		
 		for (Integer key : toUpdate.keySet()) {
 			products.put(key, toUpdate.get(key));
 		}
@@ -44,6 +47,9 @@ public class ProductService implements IProductService {
 			toUpdate = productPersistence.loadProductsFromExcelFile(fileRoute);
 		else
 			toUpdate = productPersistence.loadProductsFromDatFile(fileRoute);
+		
+		if (toUpdate == null)
+			return;
 		
 		for (Integer key : toUpdate.keySet()) {
 			products.put(key, toUpdate.get(key));

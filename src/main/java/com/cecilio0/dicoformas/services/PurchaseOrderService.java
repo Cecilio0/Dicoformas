@@ -32,6 +32,9 @@ public class PurchaseOrderService implements IPurchaseOrderService {
 	public void updateOrders(String fileRoute) throws IOException {
 		Map<Integer, PurchaseOrderModel> toUpdate = purchaseOrderPersistence.loadPurchaseOrdersFromExcelFile(fileRoute, purchaseProductService.getProducts());
 		
+		if (toUpdate == null)
+			return;
+		
 		for (Integer key : toUpdate.keySet()) {
 			purchaseOrders.put(key, toUpdate.get(key));
 		}
@@ -45,6 +48,9 @@ public class PurchaseOrderService implements IPurchaseOrderService {
 			toUpdate = purchaseOrderPersistence.loadPurchaseOrdersFromExcelFile(fileRoute, purchaseProductService.getProducts());
 		else
 			toUpdate = purchaseOrderPersistence.loadPurchaseOrdersFromDatFile(fileRoute);
+		
+		if (toUpdate == null)
+			return;
 		
 		for (Integer key : toUpdate.keySet()) {
 			purchaseOrders.put(key, toUpdate.get(key));

@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.stage.Stage;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -28,6 +29,8 @@ public class MainWindowController {
 	@FXML
 	private LineChart<Number, Number> lineChart;
 	
+	private Stage stage;
+	
 	////////////////////////////// SERVICES //////////////////////////////
 	public void setPurchaseProductService(IProductService service) {
 		this.purchaseProductService = service;
@@ -45,6 +48,19 @@ public class MainWindowController {
 		this.saleOrderService = service;
 	}
 	
+	////////////////////////////// MISC //////////////////////////////
+	
+	public void initialize() {
+		displayLineChart();
+	}
+	
+	public void setStage(Stage stage) {
+		this.stage = stage;
+		
+		stage.setOnCloseRequest(event -> {
+			saveAllData();
+		});
+	}
 	
 	////////////////////////////// MENU  //////////////////////////////
 	
@@ -72,6 +88,8 @@ public class MainWindowController {
 			Alert alert;
 			if (file != null) {
 				purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+				
+				purchaseProductService.saveProducts("./purchaseProducts.dat", FileType.DAT);
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de productos de MP");
@@ -116,6 +134,8 @@ public class MainWindowController {
 			Alert alert;
 			if (file != null) {
 				 purchaseOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
+				 
+				 purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de compras");
@@ -160,6 +180,8 @@ public class MainWindowController {
 			Alert alert;
 			if (file != null) {
 				saleProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+				
+				saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de productos de PT");
@@ -206,6 +228,8 @@ public class MainWindowController {
 			if (file != null) {
 				saleOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
 				
+				saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
+				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Carga de pedidos");
 				alert.setHeaderText(null);
@@ -230,7 +254,7 @@ public class MainWindowController {
 	
 	@FXML
 	private void closeApp(ActionEvent event) {
-		// TODO: save data before closing
+		saveAllData();
 		System.exit(0);
 	}
 	
@@ -286,5 +310,23 @@ public class MainWindowController {
 	@FXML
 	private void showChart(ActionEvent event) {
 		displayLineChart();  // This will show the chart when the button is clicked
+	}
+	
+	////////////////////////////// UTILS //////////////////////////////
+	
+	private void saveAllData() {
+		try {
+			purchaseProductService.saveProducts("./purchaseProducts.dat", FileType.DAT);
+			purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
+			saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
+			saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
+		} catch (Exception e) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Error al guardar los datos");
+			alert.setHeaderText(null);
+			alert.setContentText(e.getMessage());
+			
+			alert.showAndWait();
+		}
 	}
 }

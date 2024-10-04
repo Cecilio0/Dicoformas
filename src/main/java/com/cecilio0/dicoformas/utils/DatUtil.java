@@ -10,8 +10,13 @@ public final class DatUtil {
 	}
 	
 	public static Object readObjectFromFile(String filename) throws IOException, ClassNotFoundException {
-		FileInputStream fileIn = new FileInputStream(filename);
-		ObjectInputStream in = new ObjectInputStream(fileIn);
-		return in.readObject();
+		File file = new File(filename);
+		
+		if (!file.exists())
+			return null;
+		
+		FileInputStream fileIn = new FileInputStream(file);
+		ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+		return objectIn.readObject();
 	}
 }

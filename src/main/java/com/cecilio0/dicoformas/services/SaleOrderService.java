@@ -31,6 +31,9 @@ public class SaleOrderService implements ISaleOrderService {
 	public void updateOrders(String fileRoute) throws IOException {
 		Map<Integer, SaleOrderModel> toUpdate = saleOrderPersistence.loadSaleOrdersFromExcelFile(fileRoute, saleProductService.getProducts());
 		
+		if (toUpdate == null)
+			return;
+		
 		for (Integer key : toUpdate.keySet()) {
 			saleOrders.put(key, toUpdate.get(key));
 		}
@@ -52,6 +55,9 @@ public class SaleOrderService implements ISaleOrderService {
 			toUpdate = saleOrderPersistence.loadSaleOrdersFromExcelFile(fileRoute, saleProductService.getProducts());
 		else
 			toUpdate = saleOrderPersistence.loadSaleOrdersFromDatFile(fileRoute);
+		
+		if (toUpdate == null)
+			return;
 		
 		for (Integer key : toUpdate.keySet()) {
 			saleOrders.put(key, toUpdate.get(key));
