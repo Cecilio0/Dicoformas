@@ -29,7 +29,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 		keys.add("PEDIDO"); // Order code
 		keys.add("FECHA"); // Order date
 		keys.add("CODIGO"); // Order product code
-		keys.add("NOMBRE"); // In case the code is not registered
+		keys.add("NOMBRE"); // In case the product code is not registered
 		keys.add("DETALLE"); // In case the product has code 1200
 		keys.add("CANTIDAD"); // How many of the product were bought
 		keys.add("VALOR"); // Price of the product being detailed
@@ -64,7 +64,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 				saleOrder = SaleOrderModel.builder()
 						.code(orderCode)
 						.orderPlacedDate(LocalDate.ofEpochDay(date-25569))
-						.invoice((int) currentRow.getCell(keyPositions.get("FACTURA")).getNumericCellValue()) // todo Check how to get this information from excel file
+						.invoice((int) currentRow.getCell(keyPositions.get("FACTURA")).getNumericCellValue())
 						.productOrders(new ArrayList<>())
 						.build();
 			}

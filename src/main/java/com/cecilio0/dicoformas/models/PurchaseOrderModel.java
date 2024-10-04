@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 // todo Do this with one order class if possible without issues
@@ -15,6 +15,7 @@ public class PurchaseOrderModel implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 2L;
 	private Integer code;
-	private List<ProductOrder> products;
-	private Date orderPlacedDate;
+	private Integer invoice;
+	private List<ProductOrder> productOrders;
+	private LocalDate orderPlacedDate;
 }
