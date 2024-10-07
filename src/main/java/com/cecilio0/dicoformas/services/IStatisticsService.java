@@ -2,6 +2,10 @@ package com.cecilio0.dicoformas.services;
 
 import com.cecilio0.dicoformas.models.TimePeriodType;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
 //TODO: Implement this interface
 public interface IStatisticsService {
 
@@ -13,8 +17,8 @@ public interface IStatisticsService {
 	
 	double getTotalPurchaseOrderWeight();
 	
-	double getPurchaseOrderWeightByTimePeriod(TimePeriodType timePeriodType, int periodStart, int periodSize);
+	Map<LocalDate, Double> getPurchaseOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd);
 	
-	double getSaleOrderWeightByTimePeriod(TimePeriodType timePeriodType, int periodStart, int periodSize);
+	Map<LocalDate, Double> getSaleOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd);
 
 }

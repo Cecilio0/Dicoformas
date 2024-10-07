@@ -69,15 +69,17 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 						.build();
 			}
 			
+			String tempCode = currentRow.getCell(keyPositions.get("CODIGO")).getStringCellValue().trim();
+			
 			// "FLETES" are products built by a different company, so they are not registered in the system
-			if(currentRow.getCell(keyPositions.get("CODIGO")).getStringCellValue().trim().equals("FLETES"))
+			if(tempCode.equals("FLETES"))
 				continue;
 			
-			Integer productCode = Integer.parseInt(currentRow.getCell(keyPositions.get("CODIGO")).getStringCellValue().trim());
+			Integer productCode = Integer.parseInt(tempCode);
 			
 			String detail = currentRow.getCell(keyPositions.get("DETALLE")).getStringCellValue().trim();
 			double weightKG = 0;
-			// todo Implement exception for no parenthesis found, not sure if this actually has to be done
+			
 			if(detail.indexOf('(') != -1 && detail.indexOf(')') != -1){
 				String substring = detail.substring(detail.lastIndexOf('('), detail.lastIndexOf(')'));
 				if(NumberUtils.isCreatable(substring))

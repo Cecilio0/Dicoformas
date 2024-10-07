@@ -6,8 +6,11 @@ import com.cecilio0.dicoformas.utils.XMLReader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.w3c.dom.Element;
+
+import java.util.Objects;
 
 public class Main extends Application {
 	
@@ -22,9 +25,13 @@ public class Main extends Application {
 		controller.setSaleOrderService(SaleOrderController.getInstance().getSaleOrderService());
 		controller.setPurchaseProductService(PurchaseProductController.getInstance().getPurchaseProductService());
 		controller.setPurchaseOrderService(PurchaseOrderController.getInstance().getPurchaseOrderService());
-		controller.setStage(primaryStage);
+		controller.setStatisticsService(StatisticsController.getInstance().getStatisticsService());
+		controller.setStageOnClose(primaryStage);
 		
 		// Set the scene and show the stage
+		Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/stats-icon.jpg")));
+		primaryStage.getIcons().add(icon);
+		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("DicoStat");
 		primaryStage.show();
@@ -59,9 +66,6 @@ public class Main extends Application {
 //			purchaseOrderController.saveSaleOrders("./../purchaseOrders.dat", FileType.DAT);
 			
 			StatisticsController statisticsController = StatisticsController.getInstance();
-//			System.out.println(statisticsController.getStatisticsService().getTotalSaleOrderWeight());
-//			System.out.println(statisticsController.getStatisticsService().getTotalPurchaseOrderWeight());
-//			statisticsController.showStatistics();
 
 //			Element node = XMLReader.readXML("dialogs/mainWindow.xml");
 //			System.out.println(node.getElementsByTagName("title").item(0).getTextContent());

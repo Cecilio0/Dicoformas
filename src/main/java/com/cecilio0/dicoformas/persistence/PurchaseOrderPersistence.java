@@ -68,7 +68,7 @@ public class PurchaseOrderPersistence implements IPurchaseOrderPersistence {
 			if(tempCode.equals("FLETES") || tempCode.equals("ANTICIPO"))
 				continue;
 			
-			Integer productCode = Integer.parseInt(currentRow.getCell(keyPositions.get("CODIGO")).getStringCellValue().trim());
+			Integer productCode = Integer.parseInt(tempCode);
 			
 			// If the product found is a custom product then register it as such
 			if (productCode != 1200 && productCode != 3086){

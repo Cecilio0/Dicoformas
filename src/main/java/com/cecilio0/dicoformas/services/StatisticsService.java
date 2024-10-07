@@ -2,6 +2,12 @@ package com.cecilio0.dicoformas.services;
 
 import com.cecilio0.dicoformas.models.TimePeriodType;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 // todo Complete this implementation
 public class StatisticsService implements IStatisticsService{
 	private final IProductService saleProductService;
@@ -55,15 +61,65 @@ public class StatisticsService implements IStatisticsService{
 		return result;
 	}
 	
-	// TODO: Implement this method
 	@Override
-	public double getPurchaseOrderWeightByTimePeriod(TimePeriodType timePeriodType, int periodStart, int periodSize) {
-		return 0;
+	public Map<LocalDate, Double> getPurchaseOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) {
+		Map<LocalDate, Double> result = new HashMap<>();
+		
+		List<LocalDate> keyDates = new ArrayList<>();
+		if(timePeriodType == TimePeriodType.MONTH){
+			LocalDate date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
+			while(date.isBefore(periodEnd)){
+				keyDates.add(date);
+				date = date.plusMonths(1);
+			}
+		}
+		
+		for (LocalDate keyDate : keyDates) {
+			double weight = purchaseOrderService.getOrders().values().stream().filter(
+					purchaseOrder -> purchaseOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth()
+							&& purchaseOrder.getOrderPlacedDate().getYear() == keyDate.getYear()
+			).reduce(
+					0.0,
+					(totalWeight, purchaseOrder) -> totalWeight + purchaseOrder.getProductOrders().stream().reduce(
+							0.0,
+							(orderWeight, productOrder) -> orderWeight + productOrder.getAmount() * productOrder.getProduct().getWeightKG(),
+							Double::sum
+					),
+					Double::sum);
+			result.put(keyDate, weight);
+		}
+		
+		return result;
 	}
 	
-	// TODO: Implement this method
 	@Override
-	public double getSaleOrderWeightByTimePeriod(TimePeriodType timePeriodType, int periodStart, int periodSize) {
-		return 0;
+	public Map<LocalDate, Double> getSaleOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) {
+		Map<LocalDate, Double> result = new HashMap<>();
+		
+		List<LocalDate> keyDates = new ArrayList<>();
+		if(timePeriodType == TimePeriodType.MONTH){
+			LocalDate date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
+			while(date.isBefore(periodEnd)){
+				keyDates.add(date);
+				date = date.plusMonths(1);
+			}
+		}
+		
+		for (LocalDate keyDate : keyDates) {
+			double weight = saleOrderService.getOrders().values().stream().filter(
+					saleOrder -> saleOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth()
+							&& saleOrder.getOrderPlacedDate().getYear() == keyDate.getYear()
+			).reduce(
+					0.0,
+					(totalWeight, saleOrder) -> totalWeight + saleOrder.getProductOrders().stream().reduce(
+							0.0,
+							(orderWeight, productOrder) -> orderWeight + productOrder.getAmount() * productOrder.getProduct().getWeightKG(),
+							Double::sum
+					),
+					Double::sum);
+			result.put(keyDate, weight);
+		}
+		
+		return result;
 	}
 }

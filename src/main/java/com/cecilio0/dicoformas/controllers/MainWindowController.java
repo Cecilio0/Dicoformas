@@ -1,12 +1,18 @@
 package com.cecilio0.dicoformas.controllers;
 
+import com.cecilio0.dicoformas.models.TimePeriodType;
 import com.cecilio0.dicoformas.services.IProductService;
 import com.cecilio0.dicoformas.services.IPurchaseOrderService;
 import com.cecilio0.dicoformas.services.ISaleOrderService;
+import com.cecilio0.dicoformas.services.IStatisticsService;
 import com.cecilio0.dicoformas.utils.FileType;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.stage.FileChooser;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -15,6 +21,8 @@ import javafx.stage.Stage;
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.*;
 
 public class MainWindowController {
 	
@@ -26,10 +34,23 @@ public class MainWindowController {
 	
 	private ISaleOrderService saleOrderService;
 	
-	@FXML
-	private LineChart<Number, Number> lineChart;
+	private IStatisticsService statisticsService;
 	
-	private Stage stage;
+	@FXML
+	private LineChart<String, Number> lineChart;
+	
+	@FXML
+	private ChoiceBox<String> timePeriodTypeChoiceBox;
+	
+	@FXML
+	private DatePicker periodStartChoiceBox;
+	
+	@FXML
+	private DatePicker periodEndChoiceBox;
+	
+	public void setStageOnClose(Stage stage) {
+		stage.setOnCloseRequest(event -> saveAllData());
+	}
 	
 	////////////////////////////// SERVICES //////////////////////////////
 	public void setPurchaseProductService(IProductService service) {
@@ -48,18 +69,32 @@ public class MainWindowController {
 		this.saleOrderService = service;
 	}
 	
-	////////////////////////////// MISC //////////////////////////////
-	
-	public void initialize() {
+	public void setStatisticsService(IStatisticsService service) {
+		this.statisticsService = service;
 		displayLineChart();
 	}
 	
-	public void setStage(Stage stage) {
-		this.stage = stage;
+	////////////////////////////// MISC //////////////////////////////
+	
+	public void initialize() {
+		timePeriodTypeChoiceBox.getItems().setAll("Meses", "Años");
+		timePeriodTypeChoiceBox.setValue("Meses");
+		timePeriodTypeChoiceBox.valueProperty().addListener(this::updateLineChart);
 		
-		stage.setOnCloseRequest(event -> {
-			saveAllData();
-		});
+		periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).withDayOfMonth(1));
+		periodStartChoiceBox.valueProperty().addListener(this::updateLineChart);
+		
+		periodEndChoiceBox.setValue(LocalDate.now().withDayOfMonth(1));
+		periodEndChoiceBox.valueProperty().addListener(this::updateLineChart);
+		
+		lineChart.getXAxis().setTickLabelRotation(90);
+	}
+	
+	private void updateLineChart(ObservableValue<?> observableValue, Object oldValue, Object newValue) {
+		if(Objects.equals(oldValue, newValue))
+			return;
+		
+		displayLineChart();
 	}
 	
 	////////////////////////////// MENU  //////////////////////////////
@@ -274,42 +309,55 @@ public class MainWindowController {
 	
 	// Method to create and display the LineChart
 	private void displayLineChart() {
+		Map<LocalDate, Double> saleOrderData, purchaseOrderData;
+		
+		if(timePeriodTypeChoiceBox.getValue().equals("Meses")) {
+			saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(TimePeriodType.MONTH, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+			purchaseOrderData = statisticsService.getPurchaseOrderWeightByTimePeriod(TimePeriodType.MONTH, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+		} else {
+			saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(TimePeriodType.YEAR, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+			purchaseOrderData = statisticsService.getPurchaseOrderWeightByTimePeriod(TimePeriodType.YEAR, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+		}
+		
 		// Clear any existing data in the chart
 		lineChart.getData().clear();
 		
-		lineChart.getXAxis().setLabel("Months");
-		lineChart.getYAxis().setLabel("Orders");
+		lineChart.getXAxis().setLabel(timePeriodTypeChoiceBox.getValue());
+		lineChart.getYAxis().setLabel("Peso (Kg)");
 		
-		// Create the first dataset for Sales Orders
-		XYChart.Series<Number, Number> salesOrdersSeries = new XYChart.Series<>();
-		salesOrdersSeries.setName("Sales Orders");
+		// Create the first dataset for Sale Orders
+		XYChart.Series<String, Number> saleOrderSeries = new XYChart.Series<>();
+		saleOrderSeries.setName("Ventas PT");
+		
+		List<LocalDate> keys = saleOrderData.keySet().stream().sorted().toList();
+		
+		for (LocalDate key : keys) {
+			saleOrderSeries.getData().add(new XYChart.Data<>(key.toString(), saleOrderData.get(key)));
+		}
 		
 		// Mock data for Sales Orders
-		salesOrdersSeries.getData().add(new XYChart.Data<>(1, 50));
-		salesOrdersSeries.getData().add(new XYChart.Data<>(2, 80));
-		salesOrdersSeries.getData().add(new XYChart.Data<>(3, 45));
-		salesOrdersSeries.getData().add(new XYChart.Data<>(4, 90));
-		salesOrdersSeries.getData().add(new XYChart.Data<>(5, 60));
+//		salesOrdersSeries.getData().add(new XYChart.Data<>("1", 50));
+//		salesOrdersSeries.getData().add(new XYChart.Data<>("2", 80));
+//		salesOrdersSeries.getData().add(new XYChart.Data<>("3", 45));
+//		salesOrdersSeries.getData().add(new XYChart.Data<>("4", 90));
+//		salesOrdersSeries.getData().add(new XYChart.Data<>("5", 60));
 		
-		// Create the second dataset for Purchase Orders
-		XYChart.Series<Number, Number> purchaseOrdersSeries = new XYChart.Series<>();
-		purchaseOrdersSeries.setName("Purchase Orders");
+		XYChart.Series<String, Number> purchaseOrderSeries = new XYChart.Series<>();
+		purchaseOrderSeries.setName("Compras MP");
 		
-		// Mock data for Purchase Orders
-		purchaseOrdersSeries.getData().add(new XYChart.Data<>(1, 30));
-		purchaseOrdersSeries.getData().add(new XYChart.Data<>(2, 60));
-		purchaseOrdersSeries.getData().add(new XYChart.Data<>(3, 35));
-		purchaseOrdersSeries.getData().add(new XYChart.Data<>(4, 70));
-		purchaseOrdersSeries.getData().add(new XYChart.Data<>(5, 55));
+		keys = purchaseOrderData.keySet().stream().sorted().toList();
+		
+		for (LocalDate key : keys) {
+			purchaseOrderSeries.getData().add(new XYChart.Data<>(key.toString(), purchaseOrderData.get(key)));
+		}
+		
+		// Update the X Axis with the new keys
+		CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
+		xAxis.getCategories().clear();
+		xAxis.getCategories().addAll(keys.stream().map(LocalDate::toString).toList());
 		
 		// Add both datasets to the existing LineChart
-		lineChart.getData().addAll(salesOrdersSeries, purchaseOrdersSeries);
-	}
-	
-	
-	@FXML
-	private void showChart(ActionEvent event) {
-		displayLineChart();  // This will show the chart when the button is clicked
+		lineChart.getData().addAll(saleOrderSeries, purchaseOrderSeries);
 	}
 	
 	////////////////////////////// UTILS //////////////////////////////
