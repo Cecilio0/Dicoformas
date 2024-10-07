@@ -66,17 +66,26 @@ public class StatisticsService implements IStatisticsService{
 		Map<LocalDate, Double> result = new HashMap<>();
 		
 		List<LocalDate> keyDates = new ArrayList<>();
-		if(timePeriodType == TimePeriodType.MONTH){
+		if(timePeriodType.equals(TimePeriodType.MONTH)){
 			LocalDate date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
 			while(date.isBefore(periodEnd)){
 				keyDates.add(date);
 				date = date.plusMonths(1);
 			}
+			keyDates.add(date);
+			
+		} else {
+			LocalDate date = LocalDate.of(periodStart.getYear(), 1, 1);
+			while(date.isBefore(periodEnd)){
+				keyDates.add(date);
+				date = date.plusYears(1);
+			}
+			keyDates.add(date);
 		}
 		
 		for (LocalDate keyDate : keyDates) {
 			double weight = purchaseOrderService.getOrders().values().stream().filter(
-					purchaseOrder -> purchaseOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth()
+					purchaseOrder -> (timePeriodType.equals(TimePeriodType.YEAR) || purchaseOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth())
 							&& purchaseOrder.getOrderPlacedDate().getYear() == keyDate.getYear()
 			).reduce(
 					0.0,
@@ -103,11 +112,19 @@ public class StatisticsService implements IStatisticsService{
 				keyDates.add(date);
 				date = date.plusMonths(1);
 			}
+			keyDates.add(date);
+		} else {
+			LocalDate date = LocalDate.of(periodStart.getYear(), 1, 1);
+			while(date.isBefore(periodEnd)){
+				keyDates.add(date);
+				date = date.plusYears(1);
+			}
+			keyDates.add(date);
 		}
 		
 		for (LocalDate keyDate : keyDates) {
 			double weight = saleOrderService.getOrders().values().stream().filter(
-					saleOrder -> saleOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth()
+					saleOrder -> (timePeriodType.equals(TimePeriodType.YEAR) || saleOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth())
 							&& saleOrder.getOrderPlacedDate().getYear() == keyDate.getYear()
 			).reduce(
 					0.0,

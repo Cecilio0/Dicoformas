@@ -52,6 +52,9 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 			}
 		}
 		
+		if (keyPositions.size() != keys.size())
+			throw new IOException("The keys were not found in the excel file");
+		
 		Map<Integer, SaleOrderModel> saleOrders = new HashMap<>();
 		Row currentRow;
 		while (rowIterator.hasNext() &&

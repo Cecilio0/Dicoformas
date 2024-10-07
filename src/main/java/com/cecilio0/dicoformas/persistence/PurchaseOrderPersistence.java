@@ -45,11 +45,14 @@ public class PurchaseOrderPersistence implements IPurchaseOrderPersistence {
 			}
 		}
 		
+		if (keyPositions.size() != keys.size())
+			throw new IOException("The keys were not found in the excel file");
+		
+		
 		Map<Integer, PurchaseOrderModel> purchaseOrders = new HashMap<>();
 		Row currentRow;
 		while (rowIterator.hasNext() &&
 				!Objects.equals((currentRow = rowIterator.next()).getCell(keyPositions.get("NUMERO")).getStringCellValue(), "")){
-			
 			Integer orderCode = Integer.parseInt(currentRow.getCell(keyPositions.get("NUMERO")).getStringCellValue().trim());
 			PurchaseOrderModel purchaseOrder;
 			if((purchaseOrder = purchaseOrders.get(orderCode)) == null){

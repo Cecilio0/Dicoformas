@@ -40,6 +40,9 @@ public interface IProductPersistence {
 			}
 		}
 		
+		if (keyPositions.size() != keys.size())
+			throw new IOException("The keys were not found in the excel file");
+		
 		Map<Integer, ProductModel> products = new HashMap<>();
 		
 		while (rowIterator.hasNext()){

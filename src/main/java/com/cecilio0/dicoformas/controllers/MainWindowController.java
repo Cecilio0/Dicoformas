@@ -13,6 +13,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -79,7 +80,7 @@ public class MainWindowController {
 	public void initialize() {
 		timePeriodTypeChoiceBox.getItems().setAll("Meses", "Años");
 		timePeriodTypeChoiceBox.setValue("Meses");
-		timePeriodTypeChoiceBox.valueProperty().addListener(this::updateLineChart);
+		timePeriodTypeChoiceBox.valueProperty().addListener(this::onTimePeriodTypeChoiceBoxSelectionChanged);
 		
 		periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).withDayOfMonth(1));
 		periodStartChoiceBox.valueProperty().addListener(this::updateLineChart);
@@ -95,6 +96,19 @@ public class MainWindowController {
 			return;
 		
 		displayLineChart();
+	}
+	
+	private void onTimePeriodTypeChoiceBoxSelectionChanged(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+		if(Objects.equals(oldValue, newValue))
+			return;
+		
+		if(newValue.equals("Meses")){
+			periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).withDayOfMonth(1));
+			periodEndChoiceBox.setValue(LocalDate.now().withDayOfMonth(1));
+		} else {
+			periodStartChoiceBox.setValue(LocalDate.now().minusYears(5).withMonth(1).withDayOfMonth(1));
+			periodEndChoiceBox.setValue(LocalDate.now().withMonth(1).withDayOfMonth(1));
+		}
 	}
 	
 	////////////////////////////// MENU  //////////////////////////////
@@ -122,27 +136,31 @@ public class MainWindowController {
 			
 			Alert alert;
 			if (file != null) {
-				purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
-				
-				purchaseProductService.saveProducts("./purchaseProducts.dat", FileType.DAT);
-				
-				alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Carga de productos de MP");
-				alert.setHeaderText(null);
-				alert.setContentText("Productos de MP cargados correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " productos.");
-				
-				alert.showAndWait();
+				try {
+					purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+					
+					purchaseProductService.saveProducts("./purchaseProducts.dat", FileType.DAT);
+					
+					alert = new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Carga de MP");
+					alert.setHeaderText(null);
+					alert.setContentText("MP cargadas correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " MP.");
+				} catch (Exception e) {
+					alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Error al cargar MP");
+					alert.setHeaderText(null);
+					alert.setContentText("Error al cargar MP. Por favor, revise que haya seleccionado el archivo correcto.");
+				}
 			} else {
 				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar productos de MP");
+				alert.setTitle("Error al cargar MP");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
-				
-				alert.showAndWait();
 			}
+			alert.showAndWait();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Error al cargar productos de MP");
+			alert.setTitle("Error al cargar MP");
 			alert.setHeaderText(null);
 			alert.setContentText(e.getMessage());
 		}
@@ -152,7 +170,7 @@ public class MainWindowController {
 	private void loadPurchaseOrders(ActionEvent event) {
 		try {
 			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Abrir archivo de Compras");
+			fileChooser.setTitle("Abrir archivo de Compras MP");
 			fileChooser.getExtensionFilters().addAll(
 					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls"),
 					new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
@@ -168,26 +186,30 @@ public class MainWindowController {
 			File file = fileChooser.showOpenDialog(null);
 			Alert alert;
 			if (file != null) {
-				 purchaseOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
-				 
-				 purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
-				
-				alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Carga de compras");
-				alert.setHeaderText(null);
-				alert.setContentText("Compras cargadas correctamente. Se cargaron " + purchaseOrderService.getOrders().size() + " compras.");
-				
+				try {
+					purchaseOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
+					purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
+					
+					alert = new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Carga de compras MP");
+					alert.setHeaderText(null);
+					alert.setContentText("Compras cargadas correctamente. Se cargaron " + purchaseOrderService.getOrders().size() + " compras.");
+				} catch (Exception e) {
+					alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Error al cargar compras MP.");
+					alert.setHeaderText(null);
+					alert.setContentText("Error al cargar compras de MP. Por favor, revise que haya seleccionado el archivo correcto.");
+				}
 			} else {
 				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar compras");
+				alert.setTitle("Error al cargar compras MP");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
-				
 			}
 			alert.showAndWait();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Error al cargar compras");
+			alert.setTitle("Error al cargar compras MP");
 			alert.setHeaderText(null);
 			alert.setContentText(e.getMessage());
 		}
@@ -214,27 +236,31 @@ public class MainWindowController {
 			
 			Alert alert;
 			if (file != null) {
-				saleProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
-				
-				saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
-				
-				alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Carga de productos de PT");
-				alert.setHeaderText(null);
-				alert.setContentText("Productos de PT cargados correctamente. Se cargaron " + saleProductService.getProducts().size() + " productos.");
-				
-				alert.showAndWait();
+				try {
+					saleProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+					
+					saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
+					
+					alert = new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Carga de PT");
+					alert.setHeaderText(null);
+					alert.setContentText("PT cargados correctamente. Se cargaron " + saleProductService.getProducts().size() + " PT.");
+				} catch (Exception e) {
+					alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Error al cargar PT");
+					alert.setHeaderText(null);
+					alert.setContentText("Error al cargar PT. Por favor, revise que haya seleccionado el archivo correcto.");
+				}
 			} else {
 				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar productos de PT");
+				alert.setTitle("Error al cargar PT");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
-				
-				alert.showAndWait();
 			}
+			alert.showAndWait();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Error al cargar productos de PT");
+			alert.setTitle("Error al cargar PT");
 			alert.setHeaderText(null);
 			alert.setContentText(e.getMessage());
 		}
@@ -244,7 +270,7 @@ public class MainWindowController {
 	private void loadSaleOrders(ActionEvent event) {
 		try {
 			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Abrir archivo de Pedidos");
+			fileChooser.setTitle("Abrir archivo de Pedidos PT");
 			fileChooser.getExtensionFilters().addAll(
 					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls"),
 					new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
@@ -261,27 +287,31 @@ public class MainWindowController {
 			
 			Alert alert;
 			if (file != null) {
-				saleOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
-				
-				saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
-				
-				alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle("Carga de pedidos");
-				alert.setHeaderText(null);
-				alert.setContentText("Pedidos cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
-				
-				alert.showAndWait();
+				try {
+					saleOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
+					
+					saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
+					
+					alert = new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle("Carga de pedidos PT");
+					alert.setHeaderText(null);
+					alert.setContentText("Pedidos PT cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
+				} catch (Exception e) {
+					alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Error al cargar pedidos PT");
+					alert.setHeaderText(null);
+					alert.setContentText("Error al cargar pedidos PT. Por favor, revise que haya seleccionado el archivo correcto.");
+				}
 			} else {
 				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar pedidos");
+				alert.setTitle("Error al cargar pedidos PT");
 				alert.setHeaderText(null);
 				alert.setContentText("No se ha seleccionado ningún archivo.");
-				
-				alert.showAndWait();
 			}
+			alert.showAndWait();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Error al cargar pedidos");
+			alert.setTitle("Error al cargar pedidos PT");
 			alert.setHeaderText(null);
 			alert.setContentText(e.getMessage());
 		}
@@ -310,14 +340,9 @@ public class MainWindowController {
 	// Method to create and display the LineChart
 	private void displayLineChart() {
 		Map<LocalDate, Double> saleOrderData, purchaseOrderData;
-		
-		if(timePeriodTypeChoiceBox.getValue().equals("Meses")) {
-			saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(TimePeriodType.MONTH, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
-			purchaseOrderData = statisticsService.getPurchaseOrderWeightByTimePeriod(TimePeriodType.MONTH, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
-		} else {
-			saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(TimePeriodType.YEAR, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
-			purchaseOrderData = statisticsService.getPurchaseOrderWeightByTimePeriod(TimePeriodType.YEAR, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
-		}
+		TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
+		saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+		purchaseOrderData = statisticsService.getPurchaseOrderWeightByTimePeriod(timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
 		
 		// Clear any existing data in the chart
 		lineChart.getData().clear();
@@ -330,34 +355,38 @@ public class MainWindowController {
 		saleOrderSeries.setName("Ventas PT");
 		
 		List<LocalDate> keys = saleOrderData.keySet().stream().sorted().toList();
+		List<String> keyStrings = keys.stream().map( key -> key.toString().substring(0, timePeriodType == TimePeriodType.MONTH? 7: 5)).toList();
 		
-		for (LocalDate key : keys) {
-			saleOrderSeries.getData().add(new XYChart.Data<>(key.toString(), saleOrderData.get(key)));
+		for (int i = 0; i < keys.size(); i++) {
+			saleOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), saleOrderData.get(keys.get(i))));
 		}
 		
-		// Mock data for Sales Orders
-//		salesOrdersSeries.getData().add(new XYChart.Data<>("1", 50));
-//		salesOrdersSeries.getData().add(new XYChart.Data<>("2", 80));
-//		salesOrdersSeries.getData().add(new XYChart.Data<>("3", 45));
-//		salesOrdersSeries.getData().add(new XYChart.Data<>("4", 90));
-//		salesOrdersSeries.getData().add(new XYChart.Data<>("5", 60));
-		
+		// Create the first dataset for Purchase Orders
 		XYChart.Series<String, Number> purchaseOrderSeries = new XYChart.Series<>();
 		purchaseOrderSeries.setName("Compras MP");
 		
-		keys = purchaseOrderData.keySet().stream().sorted().toList();
-		
-		for (LocalDate key : keys) {
-			purchaseOrderSeries.getData().add(new XYChart.Data<>(key.toString(), purchaseOrderData.get(key)));
+		for (int i = 0; i < keys.size(); i++) {
+			purchaseOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), purchaseOrderData.get(keys.get(i))));
 		}
 		
 		// Update the X Axis with the new keys
 		CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
 		xAxis.getCategories().clear();
-		xAxis.getCategories().addAll(keys.stream().map(LocalDate::toString).toList());
+		xAxis.getCategories().addAll(keyStrings);
 		
 		// Add both datasets to the existing LineChart
 		lineChart.getData().addAll(saleOrderSeries, purchaseOrderSeries);
+		
+		// Add tooltips to the data points
+		for (XYChart.Data<String, Number> data : saleOrderSeries.getData()) {
+			Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + String.format("%.1f", data.getYValue().floatValue()) + " Kg");
+			Tooltip.install(data.getNode(), tooltip);
+		}
+		
+		for (XYChart.Data<String, Number> data : purchaseOrderSeries.getData()) {
+			Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + String.format("%.1f", data.getYValue().floatValue()) + " Kg");
+			Tooltip.install(data.getNode(), tooltip);
+		}
 	}
 	
 	////////////////////////////// UTILS //////////////////////////////
