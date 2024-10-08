@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URI;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -103,7 +104,7 @@ public class MainWindowController {
 			return;
 		
 		if(newValue.equals("Meses")){
-			periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).withDayOfMonth(1));
+			periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).plusMonths(1).withDayOfMonth(1));
 			periodEndChoiceBox.setValue(LocalDate.now().withDayOfMonth(1));
 		} else {
 			periodStartChoiceBox.setValue(LocalDate.now().minusYears(5).withMonth(1).withDayOfMonth(1));
@@ -355,7 +356,7 @@ public class MainWindowController {
 		saleOrderSeries.setName("Ventas PT");
 		
 		List<LocalDate> keys = saleOrderData.keySet().stream().sorted().toList();
-		List<String> keyStrings = keys.stream().map( key -> key.toString().substring(0, timePeriodType == TimePeriodType.MONTH? 7: 5)).toList();
+		List<String> keyStrings = keys.stream().map( key -> key.toString().substring(0, timePeriodType == TimePeriodType.MONTH? 7: 4)).toList();
 		
 		for (int i = 0; i < keys.size(); i++) {
 			saleOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), saleOrderData.get(keys.get(i))));
@@ -378,13 +379,16 @@ public class MainWindowController {
 		lineChart.getData().addAll(saleOrderSeries, purchaseOrderSeries);
 		
 		// Add tooltips to the data points
+		DecimalFormat df = new DecimalFormat("#,###.00");
 		for (XYChart.Data<String, Number> data : saleOrderSeries.getData()) {
-			Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + String.format("%.1f", data.getYValue().floatValue()) + " Kg");
+			String formattedValue = df.format(data.getYValue().doubleValue());
+			Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + formattedValue + " Kg");
 			Tooltip.install(data.getNode(), tooltip);
 		}
 		
 		for (XYChart.Data<String, Number> data : purchaseOrderSeries.getData()) {
-			Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + String.format("%.1f", data.getYValue().floatValue()) + " Kg");
+			String formattedValue = df.format(data.getYValue().doubleValue());
+			Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + formattedValue + " Kg");
 			Tooltip.install(data.getNode(), tooltip);
 		}
 	}
