@@ -135,28 +135,24 @@ public class MainWindowController {
 			
 			File file = fileChooser.showOpenDialog(null);
 			
+			if (file == null)
+				return;
+			
 			Alert alert;
-			if (file != null) {
-				try {
-					purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
-					
-					purchaseProductService.saveProducts("./purchaseProducts.dat", FileType.DAT);
-					
-					alert = new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Carga de MP");
-					alert.setHeaderText(null);
-					alert.setContentText("MP cargadas correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " MP.");
-				} catch (Exception e) {
-					alert = new Alert(Alert.AlertType.ERROR);
-					alert.setTitle("Error al cargar MP");
-					alert.setHeaderText(null);
-					alert.setContentText("Error al cargar MP. Por favor, revise que haya seleccionado el archivo correcto.");
-				}
-			} else {
+			try {
+				purchaseProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+				
+				purchaseProductService.saveProducts("./purchaseProducts.dat", FileType.DAT);
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Carga de MP");
+				alert.setHeaderText(null);
+				alert.setContentText("MP cargadas correctamente. Se cargaron " + purchaseProductService.getProducts().size() + " MP.");
+			} catch (Exception e) {
 				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar MP");
 				alert.setHeaderText(null);
-				alert.setContentText("No se ha seleccionado ningún archivo.");
+				alert.setContentText("Error al cargar MP. Por favor, revise que haya seleccionado el archivo correcto.");
 			}
 			alert.showAndWait();
 			displayLineChart();
@@ -186,24 +182,24 @@ public class MainWindowController {
 			}
 			
 			File file = fileChooser.showOpenDialog(null);
-			Alert alert;
-			if (file != null) {
-				try {
-					purchaseOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
-					purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
-					
-					alert = new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Carga de compras MP");
-					alert.setHeaderText(null);
-					alert.setContentText("Compras cargadas correctamente. Se cargaron " + purchaseOrderService.getOrders().size() + " compras.");
-				} catch (Exception e) {
-					alert = new Alert(Alert.AlertType.ERROR);
-					alert.setTitle("Error al cargar compras MP.");
-					alert.setHeaderText(null);
-					alert.setContentText("Error al cargar compras de MP. Por favor, revise que haya seleccionado el archivo correcto.");
-				}
-			} else
+			if (file == null)
 				return;
+			
+			Alert alert;
+			try {
+				purchaseOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
+				purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Carga de compras MP");
+				alert.setHeaderText(null);
+				alert.setContentText("Compras cargadas correctamente. Se cargaron " + purchaseOrderService.getOrders().size() + " compras.");
+			} catch (Exception e) {
+				alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al cargar compras MP.");
+				alert.setHeaderText(null);
+				alert.setContentText("Error al cargar compras de MP. Por favor, revise que haya seleccionado el archivo correcto.");
+			}
 			alert.showAndWait();
 			displayLineChart();
 		} catch (Exception e) {
@@ -233,25 +229,25 @@ public class MainWindowController {
 			
 			File file = fileChooser.showOpenDialog(null);
 			
-			Alert alert;
-			if (file != null) {
-				try {
-					saleProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
-					
-					saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
-					
-					alert = new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Carga de PT");
-					alert.setHeaderText(null);
-					alert.setContentText("PT cargados correctamente. Se cargaron " + saleProductService.getProducts().size() + " PT.");
-				} catch (Exception e) {
-					alert = new Alert(Alert.AlertType.ERROR);
-					alert.setTitle("Error al cargar PT");
-					alert.setHeaderText(null);
-					alert.setContentText("Error al cargar PT. Por favor, revise que haya seleccionado el archivo correcto.");
-				}
-			} else
+			if (file == null)
 				return;
+			
+			Alert alert;
+			try {
+				saleProductService.loadProducts(file.getAbsolutePath(), FileType.EXCEL);
+				
+				saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Carga de PT");
+				alert.setHeaderText(null);
+				alert.setContentText("PT cargados correctamente. Se cargaron " + saleProductService.getProducts().size() + " PT.");
+			} catch (Exception e) {
+				alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al cargar PT");
+				alert.setHeaderText(null);
+				alert.setContentText("Error al cargar PT. Por favor, revise que haya seleccionado el archivo correcto.");
+			}
 			alert.showAndWait();
 			displayLineChart();
 		} catch (Exception e) {
@@ -281,26 +277,25 @@ public class MainWindowController {
 			
 			File file = fileChooser.showOpenDialog(null);
 			
-			Alert alert;
-			if (file != null) {
-				try {
-					saleOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
-					
-					saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
-					
-					alert = new Alert(Alert.AlertType.INFORMATION);
-					alert.setTitle("Carga de pedidos PT");
-					alert.setHeaderText(null);
-					alert.setContentText("Pedidos PT cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
-				} catch (Exception e) {
-					alert = new Alert(Alert.AlertType.ERROR);
-					alert.setTitle("Error al cargar pedidos PT");
-					alert.setHeaderText(null);
-					alert.setContentText("Error al cargar pedidos PT. Por favor, revise que haya seleccionado el archivo correcto.");
-				}
-			} else
+			if (file == null)
 				return;
 			
+			Alert alert;
+			try {
+				saleOrderService.loadOrders(file.getAbsolutePath(), FileType.EXCEL);
+				
+				saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Carga de pedidos PT");
+				alert.setHeaderText(null);
+				alert.setContentText("Pedidos PT cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
+			} catch (Exception e) {
+				alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al cargar pedidos PT");
+				alert.setHeaderText(null);
+				alert.setContentText("Error al cargar pedidos PT. Por favor, revise que haya seleccionado el archivo correcto.");
+			}
 			alert.showAndWait();
 			displayLineChart();
 		} catch (Exception e) {
@@ -329,13 +324,13 @@ public class MainWindowController {
 			
 			File file = fileChooser.showSaveDialog(null);
 			
-			Alert alert;
 			if (file == null)
 				return;
 			
 			if (!file.getPath().endsWith(".xlsx"))
 				file = new File(file.getPath() + ".xlsx");
 			
+			Alert alert;
 			try {
 				TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
 				statisticsService.exportToExcelFile(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
