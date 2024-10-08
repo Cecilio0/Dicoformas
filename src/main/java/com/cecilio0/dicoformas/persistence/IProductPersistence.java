@@ -30,7 +30,7 @@ public interface IProductPersistence {
 			Cell firstCell = currentRow.getCell(0);
 			if(firstCell.getCellType().equals(CellType.STRING) && firstCell.getStringCellValue().equalsIgnoreCase(keys.get(0))){
 				int numberOfCells = currentRow.getPhysicalNumberOfCells();
-				for (int i = 1; i < numberOfCells; i++) {
+				for (int i = 0; i < numberOfCells; i++) {
 					Cell currentCell = currentRow.getCell(i);
 					if (keys.contains(currentCell.getStringCellValue())){
 						keyPositions.put(currentCell.getStringCellValue(), i);

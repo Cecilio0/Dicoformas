@@ -58,6 +58,8 @@
             <MenuItem mnemonicParsing="false" onAction="#loadSaleProducts" text="Cargar PT" />
             <MenuItem mnemonicParsing="false" onAction="#loadSaleOrders" text="Cargar Pedidos PT" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Exportar a Excel" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" onAction="#closeApp" text="Salir" />
           </items>
         </Menu>
@@ -68,7 +70,7 @@
         </Menu>
       </menus>
     </MenuBar>
-      <BorderPane>
+      <BorderPane VBox.vgrow="ALWAYS">
          <center>
             <LineChart fx:id="lineChart" BorderPane.alignment="CENTER">
               <xAxis>
@@ -80,7 +82,7 @@
             </LineChart>
          </center>
          <bottom>
-            <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER" fillHeight="false" maxHeight="60.0" minHeight="60.0" prefHeight="60.0" BorderPane.alignment="CENTER">
                <children>
                   <VBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
                      <children>

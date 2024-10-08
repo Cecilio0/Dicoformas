@@ -1,7 +1,6 @@
 package com.cecilio0.dicoformas.persistence;
 
 import com.cecilio0.dicoformas.models.ProductModel;
-import com.cecilio0.dicoformas.models.ProductType;
 import com.cecilio0.dicoformas.utils.ExcelReader;
 import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.*;

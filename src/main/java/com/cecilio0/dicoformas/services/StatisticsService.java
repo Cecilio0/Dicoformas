@@ -1,30 +1,27 @@
 package com.cecilio0.dicoformas.services;
 
 import com.cecilio0.dicoformas.models.TimePeriodType;
+import com.cecilio0.dicoformas.models.WeightStatsModel;
+import com.cecilio0.dicoformas.persistence.IStatisticsPersistence;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// todo Complete this implementation
 public class StatisticsService implements IStatisticsService{
-	private final IProductService saleProductService;
 	private final ISaleOrderService saleOrderService;
-	
-	
 	private final IPurchaseOrderService purchaseOrderService;
-	private final IProductService purchaseProductService;
+	private final IStatisticsPersistence statisticsPersistence;
 
-	public StatisticsService(ISaleOrderService saleOrderService,
-							 IProductService saleProductService,
-							 IPurchaseOrderService purchaseOrderService,
-							 IProductService purchaseProductService) {
+	public StatisticsService(IStatisticsPersistence statisticsPersistence,
+							 ISaleOrderService saleOrderService,
+							 IPurchaseOrderService purchaseOrderService) {
+		this.statisticsPersistence = statisticsPersistence;
 		this.saleOrderService = saleOrderService;
-		this.saleProductService = saleProductService;
 		this.purchaseOrderService = purchaseOrderService;
-		this.purchaseProductService = purchaseProductService;
 	}
 	
 	@Override
@@ -66,22 +63,22 @@ public class StatisticsService implements IStatisticsService{
 		Map<LocalDate, Double> result = new HashMap<>();
 		
 		List<LocalDate> keyDates = new ArrayList<>();
+		LocalDate date;
 		if(timePeriodType.equals(TimePeriodType.MONTH)){
-			LocalDate date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
+			date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
 			while(date.isBefore(periodEnd)){
 				keyDates.add(date);
 				date = date.plusMonths(1);
 			}
-			keyDates.add(date);
 			
 		} else {
-			LocalDate date = LocalDate.of(periodStart.getYear(), 1, 1);
+			date = LocalDate.of(periodStart.getYear(), 1, 1);
 			while(date.isBefore(periodEnd)){
 				keyDates.add(date);
 				date = date.plusYears(1);
 			}
-			keyDates.add(date);
 		}
+		keyDates.add(date);
 		
 		for (LocalDate keyDate : keyDates) {
 			double weight = purchaseOrderService.getOrders().values().stream().filter(
@@ -106,21 +103,21 @@ public class StatisticsService implements IStatisticsService{
 		Map<LocalDate, Double> result = new HashMap<>();
 		
 		List<LocalDate> keyDates = new ArrayList<>();
+		LocalDate date;
 		if(timePeriodType == TimePeriodType.MONTH){
-			LocalDate date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
+			date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
 			while(date.isBefore(periodEnd)){
 				keyDates.add(date);
 				date = date.plusMonths(1);
 			}
-			keyDates.add(date);
 		} else {
-			LocalDate date = LocalDate.of(periodStart.getYear(), 1, 1);
+			date = LocalDate.of(periodStart.getYear(), 1, 1);
 			while(date.isBefore(periodEnd)){
 				keyDates.add(date);
 				date = date.plusYears(1);
 			}
-			keyDates.add(date);
 		}
+		keyDates.add(date);
 		
 		for (LocalDate keyDate : keyDates) {
 			double weight = saleOrderService.getOrders().values().stream().filter(
@@ -138,5 +135,23 @@ public class StatisticsService implements IStatisticsService{
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public void exportToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
+		Map<LocalDate, Double> saleOrderWeightByTimePeriod = getSaleOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
+		Map<LocalDate, Double> purchaseOrderWeightByTimePeriod = getPurchaseOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
+		List<LocalDate> keyDates = saleOrderWeightByTimePeriod.keySet().stream().sorted().toList();
+		
+		List<WeightStatsModel> stats = new ArrayList<>();
+		for (LocalDate keyDate : keyDates) {
+			stats.add(WeightStatsModel.builder()
+					.date(keyDate)
+					.saleOrderWeight(saleOrderWeightByTimePeriod.get(keyDate))
+					.purchaseOrderWeight(purchaseOrderWeightByTimePeriod.get(keyDate))
+					.build());
+		}
+		
+		statisticsPersistence.writeStatisticsToExcelFile(timePeriodType, fileRoute, stats);
 	}
 }

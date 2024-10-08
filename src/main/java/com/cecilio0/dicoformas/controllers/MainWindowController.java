@@ -159,6 +159,7 @@ public class MainWindowController {
 				alert.setContentText("No se ha seleccionado ningún archivo.");
 			}
 			alert.showAndWait();
+			displayLineChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar MP");
@@ -201,13 +202,10 @@ public class MainWindowController {
 					alert.setHeaderText(null);
 					alert.setContentText("Error al cargar compras de MP. Por favor, revise que haya seleccionado el archivo correcto.");
 				}
-			} else {
-				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar compras MP");
-				alert.setHeaderText(null);
-				alert.setContentText("No se ha seleccionado ningún archivo.");
-			}
+			} else
+				return;
 			alert.showAndWait();
+			displayLineChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar compras MP");
@@ -252,13 +250,10 @@ public class MainWindowController {
 					alert.setHeaderText(null);
 					alert.setContentText("Error al cargar PT. Por favor, revise que haya seleccionado el archivo correcto.");
 				}
-			} else {
-				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar PT");
-				alert.setHeaderText(null);
-				alert.setContentText("No se ha seleccionado ningún archivo.");
-			}
+			} else
+				return;
 			alert.showAndWait();
+			displayLineChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar PT");
@@ -303,18 +298,79 @@ public class MainWindowController {
 					alert.setHeaderText(null);
 					alert.setContentText("Error al cargar pedidos PT. Por favor, revise que haya seleccionado el archivo correcto.");
 				}
-			} else {
-				alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error al cargar pedidos PT");
-				alert.setHeaderText(null);
-				alert.setContentText("No se ha seleccionado ningún archivo.");
-			}
+			} else
+				return;
+			
 			alert.showAndWait();
+			displayLineChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar pedidos PT");
 			alert.setHeaderText(null);
 			alert.setContentText(e.getMessage());
+		}
+	}
+	
+	@FXML
+	private void exportToExcel(ActionEvent event) {
+		try {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Exportar a Excel");
+			fileChooser.getExtensionFilters().addAll(
+					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls")
+			);
+			
+			String currentDir = System.getProperty("user.home");
+			File initialDir = new File(currentDir, "Documents");
+			
+			if (initialDir.exists()) {
+				fileChooser.setInitialDirectory(initialDir);
+			}
+			
+			File file = fileChooser.showSaveDialog(null);
+			
+			Alert alert;
+			if (file == null)
+				return;
+			
+			if (!file.getPath().endsWith(".xlsx"))
+				file = new File(file.getPath() + ".xlsx");
+			
+			try {
+				TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
+				statisticsService.exportToExcelFile(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Exportar a Excel");
+				alert.setHeaderText(null);
+				alert.setContentText("Datos exportados correctamente.");
+				
+				if (Desktop.isDesktopSupported()) {
+					try {
+						Desktop.getDesktop().open(file);
+					} catch (Exception e) {
+						e.printStackTrace();
+						alert = new Alert(Alert.AlertType.ERROR);
+						alert.setTitle("Error al abrir Excel");
+						alert.setHeaderText(null);
+						alert.setContentText("Error al intentar abrir el archivo en Excel.");
+						alert.showAndWait();
+					}
+				}
+			} catch (Exception e) {
+				alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al exportar a Excel");
+				alert.setHeaderText(null);
+				alert.setContentText(e.getMessage());
+				alert.showAndWait();
+			}
+		} catch (Exception e) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Error al exportar a Excel");
+			alert.setHeaderText(null);
+			alert.setContentText(e.getMessage());
+			
+			alert.showAndWait();
 		}
 	}
 	

@@ -1,14 +1,14 @@
 package com.cecilio0.dicoformas;
 
 import com.cecilio0.dicoformas.controllers.*;
+import com.cecilio0.dicoformas.persistence.*;
+import com.cecilio0.dicoformas.services.*;
 import com.cecilio0.dicoformas.utils.FileType;
-import com.cecilio0.dicoformas.utils.XMLReader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.w3c.dom.Element;
 
 import java.util.Objects;
 
@@ -21,11 +21,35 @@ public class Main extends Application {
 		
 		// Get controller instance and inject the services
 		MainWindowController controller = loader.getController();
-		controller.setSaleProductService(SaleProductController.getInstance().getSaleProductService());
-		controller.setSaleOrderService(SaleOrderController.getInstance().getSaleOrderService());
-		controller.setPurchaseProductService(PurchaseProductController.getInstance().getPurchaseProductService());
-		controller.setPurchaseOrderService(PurchaseOrderController.getInstance().getPurchaseOrderService());
-		controller.setStatisticsService(StatisticsController.getInstance().getStatisticsService());
+		
+		// PurchaseProductService
+		IProductService purchaseProductService = new ProductService(new PurchaseProductPersistence());
+		purchaseProductService.loadProducts("./purchaseProducts.dat", FileType.DAT);
+		controller.setPurchaseProductService(purchaseProductService);
+		
+		// PurchaseOrderService
+		IPurchaseOrderService purchaseOrderService = new PurchaseOrderService(new PurchaseOrderPersistence(), purchaseProductService);
+		purchaseOrderService.loadOrders("./purchaseOrders.dat", FileType.DAT);
+		controller.setPurchaseOrderService(purchaseOrderService);
+		
+		// SaleProductService
+		IProductService saleProductService = new ProductService(new SaleProductPersistence());
+		saleProductService.loadProducts("./saleProducts.dat", FileType.DAT);
+		controller.setSaleProductService(saleProductService);
+		
+		// SaleOrderService
+		ISaleOrderService saleOrderService = new SaleOrderService(new SaleOrderPersistence(), saleProductService);
+		saleOrderService.loadOrders("./saleOrders.dat", FileType.DAT);
+		controller.setSaleOrderService(saleOrderService);
+		
+		// StatisticsService
+		IStatisticsService statisticsService = new StatisticsService(
+				new StatisticsPersistence(),
+				saleOrderService,
+				purchaseOrderService
+		);
+		controller.setStatisticsService(statisticsService);
+		
 		controller.setStageOnClose(primaryStage);
 		
 		// Set the scene and show the stage
@@ -38,42 +62,6 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
-		// Controllers should be created in the following order:
-		// SaleProductController, PurchaseProductController, SaleOrderController, StatisticsController
-		
-		try {
-			SaleProductController saleProductController = SaleProductController.getInstance();
-//			saleProductController.loadSaleProducts("C:/Users/drone/Documents/Work/new data/Base de datos PT y MP.xlsx", FileType.EXCEL);
-			saleProductController.loadSaleProducts("./saleProducts.dat", FileType.DAT);
-//			saleProductController.loadSaleProducts("saleProducts.dat", FileType.DAT);
-//			saleProductController.showSaleProducts();
-
-			PurchaseProductController purchaseProductController = PurchaseProductController.getInstance();
-//			purchaseProductController.loadPurchaseProducts("C:/Users/drone/Documents/Work/new data/Base de datos PT y MP.xlsx", FileType.EXCEL);
-			purchaseProductController.loadPurchaseProducts("./purchaseProducts.dat", FileType.DAT);
-//			purchaseProductController.showPurchaseProducts();
-
-			SaleOrderController saleOrderController = SaleOrderController.getInstance();
-//			saleOrderController.loadSaleOrder("C:/Users/drone/Documents/Work/new data/Detalle Pedidos.xlsx", FileType.EXCEL);
-			saleOrderController.loadSaleOrder("./saleOrders.dat", FileType.DAT);
-//			saleOrderController.showSaleOrders();
-//			saleOrderController.saveSaleOrders("./../saleOrders.dat", FileType.DAT);
-			
-			PurchaseOrderController purchaseOrderController = PurchaseOrderController.getInstance();
-//			purchaseOrderController.loadPurchaseOrder("C:/Users/drone/Documents/Work/new data/Detalle de Compras MP.xlsx", FileType.EXCEL);
-			purchaseOrderController.loadPurchaseOrder("./purchaseOrders.dat", FileType.DAT);
-//			purchaseOrderController.showSaleOrders();
-//			purchaseOrderController.saveSaleOrders("./../purchaseOrders.dat", FileType.DAT);
-			
-			StatisticsController statisticsController = StatisticsController.getInstance();
-
-//			Element node = XMLReader.readXML("dialogs/mainWindow.xml");
-//			System.out.println(node.getElementsByTagName("title").item(0).getTextContent());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 		launch(args);
 	}
 }

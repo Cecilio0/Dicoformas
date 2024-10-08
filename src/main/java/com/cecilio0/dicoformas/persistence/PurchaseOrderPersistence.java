@@ -24,7 +24,6 @@ public class PurchaseOrderPersistence implements IPurchaseOrderPersistence {
 		keys.add("FECHA"); // Order date
 		keys.add("CODIGO"); // Order product code
 		keys.add("NOMBRE"); // In case the product code is not registered
-		keys.add("DETALLE"); // In case the product has code 1200
 		keys.add("CANTIDAD"); // How many of the product were bought
 		keys.add("VALOR"); // Price of the product being detailed
 		
