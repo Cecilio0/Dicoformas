@@ -1,7 +1,7 @@
 package com.cecilio0.dicoformas;
 
-public class RunApp {
+public class Main {
 	public static void main(String[] args) {
-		Main.main(args);
+		App.main(args);
 	}
 }
