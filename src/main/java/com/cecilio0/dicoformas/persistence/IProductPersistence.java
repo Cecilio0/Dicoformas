@@ -24,19 +24,24 @@ public interface IProductPersistence {
 		keys.add("PRECIO1");
 		keys.add("PESO");
 		
+		// Get the position for each key inside the workbook
+		// We always know the keys are in the 5th row
 		Map<String, Integer> keyPositions = new HashMap<>();
-		while (rowIterator.hasNext()){
+		
+		int index = 0;
+		while (rowIterator.hasNext() && index < 4){
+			rowIterator.next();
+			index++;
+		}
+		
+		if (rowIterator.hasNext()) {
 			Row currentRow = rowIterator.next();
-			Cell firstCell = currentRow.getCell(0);
-			if(firstCell.getCellType().equals(CellType.STRING) && firstCell.getStringCellValue().equalsIgnoreCase(keys.get(0))){
-				int numberOfCells = currentRow.getPhysicalNumberOfCells();
-				for (int i = 0; i < numberOfCells; i++) {
-					Cell currentCell = currentRow.getCell(i);
-					if (keys.contains(currentCell.getStringCellValue())){
-						keyPositions.put(currentCell.getStringCellValue(), i);
-					}
+			int numberOfCells = currentRow.getPhysicalNumberOfCells();
+			for (int i = 0; i < numberOfCells; i++) {
+				Cell currentCell = currentRow.getCell(i);
+				if (keys.contains(currentCell.getStringCellValue())) {
+					keyPositions.put(currentCell.getStringCellValue(), i);
 				}
-				break;
 			}
 		}
 		

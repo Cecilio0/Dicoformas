@@ -26,29 +26,33 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 		Iterator<Row> rowIterator = firstSheet.iterator();
 		
 		List<String> keys = new ArrayList<>();
-		keys.add("PEDIDO"); // Order code
+		keys.add("FACTURA"); // order code
 		keys.add("FECHA"); // Order date
 		keys.add("CODIGO"); // Order product code
 		keys.add("NOMBRE"); // In case the product code is not registered
-		keys.add("DETALLE"); // In case the product has code 1200
+		// todo: uncomment as soon as possible
+//		keys.add("DETALLE"); // In case the product has code 1200
 		keys.add("CANTIDAD"); // How many of the product were bought
 		keys.add("VALOR"); // Price of the product being detailed
-		keys.add("FACTURA"); // Invoice of the order
 		
 		// Get the position for each key inside the workbook
+		// We always know the keys are in the 5th row
 		Map<String, Integer> keyPositions = new HashMap<>();
-		while (rowIterator.hasNext()) {
+		
+		int index = 0;
+		while (rowIterator.hasNext() && index < 4){
+			rowIterator.next();
+			index++;
+		}
+		
+		if (rowIterator.hasNext()) {
 			Row currentRow = rowIterator.next();
-			Cell firstCell = currentRow.getCell(0);
-			if (firstCell.getCellType().equals(CellType.STRING) && firstCell.getStringCellValue().equalsIgnoreCase(keys.get(0))) {
-				int numberOfCells = currentRow.getPhysicalNumberOfCells();
-				for (int i = 0; i < numberOfCells; i++) {
-					Cell currentCell = currentRow.getCell(i);
-					if (keys.contains(currentCell.getStringCellValue())) {
-						keyPositions.put(currentCell.getStringCellValue(), i);
-					}
+			int numberOfCells = currentRow.getPhysicalNumberOfCells();
+			for (int i = 0; i < numberOfCells; i++) {
+				Cell currentCell = currentRow.getCell(i);
+				if (keys.contains(currentCell.getStringCellValue())) {
+					keyPositions.put(currentCell.getStringCellValue(), i);
 				}
-				break;
 			}
 		}
 		
@@ -58,16 +62,15 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 		Map<Integer, SaleOrderModel> saleOrders = new HashMap<>();
 		Row currentRow;
 		while (rowIterator.hasNext() &&
-				!Objects.equals((currentRow = rowIterator.next()).getCell(keyPositions.get("PEDIDO")).getStringCellValue(), "")){
+				!Objects.equals((currentRow = rowIterator.next()).getCell(keyPositions.get("FACTURA")).getStringCellValue(), "")){
 			
-			Integer orderCode = Integer.parseInt(currentRow.getCell(keyPositions.get("PEDIDO")).getStringCellValue().trim());
+			Integer orderCode = Integer.parseInt(currentRow.getCell(keyPositions.get("FACTURA")).getStringCellValue().trim());
 			SaleOrderModel saleOrder;
 			if((saleOrder = saleOrders.get(orderCode)) == null){
 				long date = (long) currentRow.getCell(keyPositions.get("FECHA")).getNumericCellValue();
 				saleOrder = SaleOrderModel.builder()
 						.code(orderCode)
 						.orderPlacedDate(LocalDate.ofEpochDay(date-25569))
-						.invoice((int) currentRow.getCell(keyPositions.get("FACTURA")).getNumericCellValue())
 						.productOrders(new ArrayList<>())
 						.build();
 			}
@@ -75,19 +78,13 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 			String tempCode = currentRow.getCell(keyPositions.get("CODIGO")).getStringCellValue().trim();
 			
 			// "FLETES" are products built by a different company, so they are not registered in the system
-			if(tempCode.equals("FLETES"))
+			// "ANTICIPO" is a payment made in advance, so it is not a product
+			if(tempCode.equals("FLETES") || tempCode.equals("ANTICIPO"))
 				continue;
 			
 			Integer productCode = Integer.parseInt(tempCode);
 			
-			String detail = currentRow.getCell(keyPositions.get("DETALLE")).getStringCellValue().trim();
 			double weightKG = 0;
-			
-			if(detail.indexOf('(') != -1 && detail.indexOf(')') != -1){
-				String substring = detail.substring(detail.lastIndexOf('('), detail.lastIndexOf(')'));
-				if(NumberUtils.isCreatable(substring))
-					weightKG = Double.parseDouble(substring);
-			}
 			
 			// If the product found is a custom product then register it as such
 			if (productCode != 1200){
@@ -106,16 +103,27 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 								products.get(productCode),
 								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
 			} else {
-				saleOrder.getProductOrders()
-						.add(new ProductOrder(
-								ProductModel.builder()
-										.type(ProductType.SALE)
-										.code(1200)
-										.weightKG(weightKG)
-										.name(currentRow.getCell(keyPositions.get("NOMBRE")).getStringCellValue().trim())
-										.price(currentRow.getCell(keyPositions.get("VALOR")).getNumericCellValue())
-										.build(),
-								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
+				// Temp for testing purposes
+				continue;
+				
+				// Get weight of special product
+//				String detail = currentRow.getCell(keyPositions.get("DETALLE")).getStringCellValue().trim();
+//				if(detail.indexOf('(') != -1 && detail.indexOf(')') != -1){
+//					String substring = detail.substring(detail.lastIndexOf('('), detail.lastIndexOf(')'));
+//					if(NumberUtils.isCreatable(substring))
+//						weightKG = Double.parseDouble(substring);
+//				}
+//
+//				saleOrder.getProductOrders()
+//						.add(new ProductOrder(
+//								ProductModel.builder()
+//										.type(ProductType.SALE)
+//										.code(1200)
+//										.weightKG(weightKG)
+//										.name(currentRow.getCell(keyPositions.get("NOMBRE")).getStringCellValue().trim())
+//										.price(currentRow.getCell(keyPositions.get("VALOR")).getNumericCellValue())
+//										.build(),
+//								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
 			}
 			
 			saleOrders.put(orderCode, saleOrder);

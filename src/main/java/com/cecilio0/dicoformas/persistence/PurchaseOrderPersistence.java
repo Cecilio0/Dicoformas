@@ -28,19 +28,23 @@ public class PurchaseOrderPersistence implements IPurchaseOrderPersistence {
 		keys.add("VALOR"); // Price of the product being detailed
 		
 		// Get the position for each key inside the workbook
+		// We always know the keys are in the 5th row
 		Map<String, Integer> keyPositions = new HashMap<>();
-		while (rowIterator.hasNext()) {
+		
+		int index = 0;
+		while (rowIterator.hasNext() && index < 4){
+			rowIterator.next();
+			index++;
+		}
+		
+		if (rowIterator.hasNext()) {
 			Row currentRow = rowIterator.next();
-			Cell orderCodeCell = currentRow.getCell(4);
-			if (orderCodeCell.getCellType().equals(CellType.STRING) && orderCodeCell.getStringCellValue().equalsIgnoreCase(keys.get(0))) {
-				int numberOfCells = currentRow.getPhysicalNumberOfCells();
-				for (int i = 0; i < numberOfCells; i++) {
-					Cell currentCell = currentRow.getCell(i);
-					if (keys.contains(currentCell.getStringCellValue())) {
-						keyPositions.put(currentCell.getStringCellValue(), i);
-					}
+			int numberOfCells = currentRow.getPhysicalNumberOfCells();
+			for (int i = 0; i < numberOfCells; i++) {
+				Cell currentCell = currentRow.getCell(i);
+				if (keys.contains(currentCell.getStringCellValue())) {
+					keyPositions.put(currentCell.getStringCellValue(), i);
 				}
-				break;
 			}
 		}
 		
