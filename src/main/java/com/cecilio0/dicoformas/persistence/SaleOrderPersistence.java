@@ -88,6 +88,8 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 			
 			// If the product found is a custom product then register it as such
 			if (productCode != 1200){
+				
+				// If the product hasn't been saved to the database then save it
 				if(products.get(productCode) == null){
 					products.put(productCode, ProductModel.builder()
 							.type(ProductType.SALE)
@@ -103,6 +105,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 								products.get(productCode),
 								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
 			} else {
+				// todo: uncomment all of this and remove the continue statement
 				// Temp for testing purposes
 				continue;
 				

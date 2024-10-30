@@ -78,6 +78,8 @@ public class PurchaseOrderPersistence implements IPurchaseOrderPersistence {
 			
 			// If the product found is a custom product then register it as such
 			if (productCode != 1200 && productCode != 3086){
+				
+				// If the product has not been saved to the database then save it
 				if(products.get(productCode) == null){
 					products.put(productCode, ProductModel.builder()
 							.type(ProductType.PURCHASE)

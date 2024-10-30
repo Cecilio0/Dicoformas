@@ -45,7 +45,9 @@ public class App extends Application {
 		// StatisticsService
 		IStatisticsService statisticsService = new StatisticsService(
 				new StatisticsPersistence(),
+				saleProductService,
 				saleOrderService,
+				purchaseProductService,
 				purchaseOrderService
 		);
 		controller.setStatisticsService(statisticsService);

@@ -1,5 +1,6 @@
 package com.cecilio0.dicoformas.services;
 
+import com.cecilio0.dicoformas.models.ProductModel;
 import com.cecilio0.dicoformas.models.TimePeriodType;
 import com.cecilio0.dicoformas.models.WeightStatsModel;
 import com.cecilio0.dicoformas.persistence.IStatisticsPersistence;
@@ -12,15 +13,21 @@ import java.util.List;
 import java.util.Map;
 
 public class StatisticsService implements IStatisticsService{
+	private final IProductService saleProductService;
 	private final ISaleOrderService saleOrderService;
+	private final IProductService purchaseProductService;
 	private final IPurchaseOrderService purchaseOrderService;
 	private final IStatisticsPersistence statisticsPersistence;
 
 	public StatisticsService(IStatisticsPersistence statisticsPersistence,
+							 IProductService saleProductService,
 							 ISaleOrderService saleOrderService,
+							 IProductService purchaseProductService,
 							 IPurchaseOrderService purchaseOrderService) {
 		this.statisticsPersistence = statisticsPersistence;
+		this.saleProductService = saleProductService;
 		this.saleOrderService = saleOrderService;
+		this.purchaseProductService = purchaseProductService;
 		this.purchaseOrderService = purchaseOrderService;
 	}
 	
@@ -80,6 +87,7 @@ public class StatisticsService implements IStatisticsService{
 		}
 		keyDates.add(date);
 		
+		Map<Integer, ProductModel> products = purchaseProductService.getProducts();
 		for (LocalDate keyDate : keyDates) {
 			double weight = purchaseOrderService.getOrders().values().stream().filter(
 					purchaseOrder -> (timePeriodType.equals(TimePeriodType.YEAR) || purchaseOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth())
@@ -88,7 +96,12 @@ public class StatisticsService implements IStatisticsService{
 					0.0,
 					(totalWeight, purchaseOrder) -> totalWeight + purchaseOrder.getProductOrders().stream().reduce(
 							0.0,
-							(orderWeight, productOrder) -> orderWeight + productOrder.getAmount() * productOrder.getProduct().getWeightKG(),
+							(orderWeight, productOrder) -> {
+								if(productOrder.getProduct().getCode() != 1200)
+									return orderWeight + productOrder.getAmount() * products.get(productOrder.getProduct().getCode()).getWeightKG();
+								else
+									return orderWeight + productOrder.getAmount() * productOrder.getProduct().getWeightKG();
+							},
 							Double::sum
 					),
 					Double::sum);
@@ -119,6 +132,7 @@ public class StatisticsService implements IStatisticsService{
 		}
 		keyDates.add(date);
 		
+		Map<Integer, ProductModel> products = saleProductService.getProducts();
 		for (LocalDate keyDate : keyDates) {
 			double weight = saleOrderService.getOrders().values().stream().filter(
 					saleOrder -> (timePeriodType.equals(TimePeriodType.YEAR) || saleOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth())
@@ -127,7 +141,12 @@ public class StatisticsService implements IStatisticsService{
 					0.0,
 					(totalWeight, saleOrder) -> totalWeight + saleOrder.getProductOrders().stream().reduce(
 							0.0,
-							(orderWeight, productOrder) -> orderWeight + productOrder.getAmount() * productOrder.getProduct().getWeightKG(),
+							(orderWeight, productOrder) -> {
+								if(productOrder.getProduct().getCode() != 1200)
+									return orderWeight + productOrder.getAmount() * products.get(productOrder.getProduct().getCode()).getWeightKG();
+								else
+									return orderWeight + productOrder.getAmount() * productOrder.getProduct().getWeightKG();
+							},
 							Double::sum
 					),
 					Double::sum);
