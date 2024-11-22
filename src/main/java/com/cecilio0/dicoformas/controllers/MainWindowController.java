@@ -18,22 +18,29 @@ import javafx.stage.FileChooser;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import lombok.Setter;
 
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MainWindowController {
 	
+	@Setter
 	private IProductService purchaseProductService;
 	
+	@Setter
 	private IPurchaseOrderService purchaseOrderService;
 	
+	@Setter
 	private IProductService saleProductService;
 	
+	@Setter
 	private ISaleOrderService saleOrderService;
 	
 	private IStatisticsService statisticsService;
@@ -54,23 +61,6 @@ public class MainWindowController {
 		stage.setOnCloseRequest(event -> saveAllData());
 	}
 	
-	////////////////////////////// SERVICES //////////////////////////////
-	public void setPurchaseProductService(IProductService service) {
-		this.purchaseProductService = service;
-	}
-	
-	public void setPurchaseOrderService(IPurchaseOrderService service) {
-		this.purchaseOrderService = service;
-	}
-	
-	public void setSaleProductService(IProductService service) {
-		this.saleProductService = service;
-	}
-	
-	public void setSaleOrderService(ISaleOrderService service) {
-		this.saleOrderService = service;
-	}
-	
 	public void setStatisticsService(IStatisticsService service) {
 		this.statisticsService = service;
 		displayLineChart();
@@ -82,10 +72,33 @@ public class MainWindowController {
 		timePeriodTypeChoiceBox.getItems().setAll("Meses", "Años");
 		timePeriodTypeChoiceBox.setValue("Meses");
 		timePeriodTypeChoiceBox.valueProperty().addListener(this::onTimePeriodTypeChoiceBoxSelectionChanged);
+
+		// todo: somehow add a check to not allow periodStart to be later than periodEnd
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		StringConverter<LocalDate> localDateConverter = new StringConverter<>() {
+			@Override
+			public String toString(LocalDate localDate) {
+				// Convert LocalDate to String with custom format
+				return (localDate != null) ? localDate.format(dateFormatter) : "";
+			}
+			
+			@Override
+			public LocalDate fromString(String string) {
+				// Convert String to LocalDate, handling parsing
+				try {
+					return (string != null && !string.isEmpty()) ? LocalDate.parse(string, dateFormatter) : null;
+				} catch (RuntimeException e) {
+					// todo: make this return a default date
+					return null; // Return null if parsing fails
+				}
+			}
+		};
 		
-		periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).withDayOfMonth(1));
+		periodStartChoiceBox.setConverter(localDateConverter);
+		periodStartChoiceBox.setValue(LocalDate.now().minusYears(1).plusMonths(1).withDayOfMonth(1));
 		periodStartChoiceBox.valueProperty().addListener(this::updateLineChart);
 		
+		periodEndChoiceBox.setConverter(localDateConverter);
 		periodEndChoiceBox.setValue(LocalDate.now().withDayOfMonth(1));
 		periodEndChoiceBox.valueProperty().addListener(this::updateLineChart);
 		
@@ -119,21 +132,7 @@ public class MainWindowController {
 	@FXML
 	private void loadPurchaseProducts(ActionEvent event) {
 		try {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Abrir archivo de MP");
-			fileChooser.getExtensionFilters().addAll(
-					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls"),
-					new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
-			);
-			
-			String currentDir = System.getProperty("user.dir");
-			File initialDir = new File(currentDir);
-			
-			if (initialDir.exists()) {
-				fileChooser.setInitialDirectory(initialDir);
-			}
-			
-			File file = fileChooser.showOpenDialog(null);
+			File file = chooseFile("Abrir archivo de MP", true, true);
 			
 			if (file == null)
 				return;
@@ -167,21 +166,8 @@ public class MainWindowController {
 	@FXML
 	private void loadPurchaseOrders(ActionEvent event) {
 		try {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Abrir archivo de Compras MP");
-			fileChooser.getExtensionFilters().addAll(
-					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls"),
-					new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
-			);
+			File file = chooseFile("Abrir archivo de Compras MP", true, true);
 			
-			String currentDir = System.getProperty("user.dir");
-			File initialDir = new File(currentDir);
-			
-			if (initialDir.exists()) {
-				fileChooser.setInitialDirectory(initialDir);
-			}
-			
-			File file = fileChooser.showOpenDialog(null);
 			if (file == null)
 				return;
 			
@@ -213,21 +199,7 @@ public class MainWindowController {
 	@FXML
 	private void loadSaleProducts(ActionEvent event) {
 		try {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Abrir archivo de PT");
-			fileChooser.getExtensionFilters().addAll(
-					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls"),
-					new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
-			);
-			
-			String currentDir = System.getProperty("user.dir");
-			File initialDir = new File(currentDir);
-			
-			if (initialDir.exists()) {
-				fileChooser.setInitialDirectory(initialDir);
-			}
-			
-			File file = fileChooser.showOpenDialog(null);
+			File file = chooseFile("Abrir archivo de PT", true, true);
 			
 			if (file == null)
 				return;
@@ -261,21 +233,7 @@ public class MainWindowController {
 	@FXML
 	private void loadSaleOrders(ActionEvent event) {
 		try {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Abrir archivo de Pedidos PT");
-			fileChooser.getExtensionFilters().addAll(
-					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls"),
-					new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
-			);
-			
-			String currentDir = System.getProperty("user.dir");
-			File initialDir = new File(currentDir);
-			
-			if (initialDir.exists()) {
-				fileChooser.setInitialDirectory(initialDir);
-			}
-			
-			File file = fileChooser.showOpenDialog(null);
+			File file = chooseFile("Abrir archivo de Pedidos PT", true, true);
 			
 			if (file == null)
 				return;
@@ -307,33 +265,24 @@ public class MainWindowController {
 	}
 	
 	@FXML
-	private void exportToExcel(ActionEvent event) {
+	private void exportWeightsByMonthToExcel(ActionEvent event) {
 		try {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Exportar a Excel");
-			fileChooser.getExtensionFilters().addAll(
-					new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls")
-			);
+			TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
 			
-			String currentDir = System.getProperty("user.home");
-			File initialDir = new File(currentDir, "Documents");
+			String title;
+			if(timePeriodType == TimePeriodType.MONTH)
+				title = "Exportar Pesos Por Mes a Excel";
+			else
+				title = "Exportar Pesos Por Año a Excel";
 			
-			if (initialDir.exists()) {
-				fileChooser.setInitialDirectory(initialDir);
-			}
-			
-			File file = fileChooser.showSaveDialog(null);
+			File file = chooseFile(title, false, false);
 			
 			if (file == null)
 				return;
 			
-			if (!file.getPath().endsWith(".xlsx"))
-				file = new File(file.getPath() + ".xlsx");
-			
 			Alert alert;
 			try {
-				TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
-				statisticsService.exportToExcelFile(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+				statisticsService.exportWeightsByMonthToExcelFile(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Exportar a Excel");
@@ -344,7 +293,58 @@ public class MainWindowController {
 					try {
 						Desktop.getDesktop().open(file);
 					} catch (Exception e) {
-						e.printStackTrace();
+						alert = new Alert(Alert.AlertType.ERROR);
+						alert.setTitle("Error al abrir Excel");
+						alert.setHeaderText(null);
+						alert.setContentText("Error al intentar abrir el archivo en Excel.");
+						alert.showAndWait();
+					}
+				}
+			} catch (Exception e) {
+				alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al exportar a Excel");
+				alert.setHeaderText(null);
+				alert.setContentText(e.getMessage());
+				alert.showAndWait();
+			}
+		} catch (Exception e) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Error al exportar a Excel");
+			alert.setHeaderText(null);
+			alert.setContentText(e.getMessage());
+			
+			alert.showAndWait();
+		}
+	}
+	
+	private void exportWeightByProductsByMonthToExcel(ActionEvent event) {
+		try {
+			TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
+			
+			String title;
+			if(timePeriodType == TimePeriodType.MONTH)
+				title = "Exportar Pesos Por Mes Por Producto a Excel";
+			else
+				title = "Exportar Pesos Por Año Por Producto a Excel";
+			
+			File file = chooseFile(title, false, false);
+			
+			if (file == null)
+				return;
+			
+			Alert alert;
+			try {
+				statisticsService.exportWeightsByProductByMonthToExcelFile(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Exportar a Excel");
+				alert.setHeaderText(null);
+				alert.setContentText("Datos exportados correctamente.");
+				
+				if (Desktop.isDesktopSupported()) {
+					try {
+						Desktop.getDesktop().open(file);
+					} catch (Exception e) {
 						alert = new Alert(Alert.AlertType.ERROR);
 						alert.setTitle("Error al abrir Excel");
 						alert.setHeaderText(null);
@@ -383,7 +383,11 @@ public class MainWindowController {
 				Desktop.getDesktop().browse(new URI("https://github.com/Cecilio0/Dicoformas"));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Error al abrir el repositorio");
+			alert.setHeaderText(null);
+			alert.setContentText("Error al intentar abrir el repositorio en GitHub.");
+			alert.showAndWait();
 		}
 	}
 	
@@ -460,5 +464,39 @@ public class MainWindowController {
 			
 			alert.showAndWait();
 		}
+	}
+	
+	private File chooseFile(String popupTitle, boolean includeAll, boolean open){
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(popupTitle);
+		fileChooser.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter("Archivos de Excel", "*.xlsx", "*.xls")
+		);
+		
+		if(includeAll)
+			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Todos los archivos", "*.*"));
+		
+		String currentDir = System.getProperty("user.home");
+		File initialDir = new File(currentDir, "Documents");
+		
+		if (initialDir.exists()) {
+			fileChooser.setInitialDirectory(initialDir);
+		}
+		
+		File file;
+		
+		// Check if we want to open or save a file
+		if(open)
+			file = fileChooser.showOpenDialog(null);
+		else
+			file = fileChooser.showSaveDialog(null);
+		
+		if (file == null)
+			return null;
+		
+		if (!file.getPath().endsWith(".xlsx") && !file.getPath().endsWith(".xls"))
+			file = new File(file.getPath() + ".xlsx");
+		
+		return file;
 	}
 }

@@ -58,7 +58,12 @@
             <MenuItem mnemonicParsing="false" onAction="#loadSaleProducts" text="Cargar PT" />
             <MenuItem mnemonicParsing="false" onAction="#loadSaleOrders" text="Cargar Pedidos PT" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Exportar a Excel" />
+                  <Menu mnemonicParsing="false" text="Exportar a Excel">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Pesos por mes" />
+                        <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Pesos por producto por mes" />
+                     </items>
+                  </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" onAction="#closeApp" text="Salir" />
           </items>
@@ -93,7 +98,7 @@
                   <VBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label text="Seleccionar fecha inicial" />
-                        <DatePicker fx:id="periodStartChoiceBox" editable="false" promptText="Selecciona una fecha" />
+                        <DatePicker fx:id="periodStartChoiceBox" promptText="Selecciona una fecha" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">

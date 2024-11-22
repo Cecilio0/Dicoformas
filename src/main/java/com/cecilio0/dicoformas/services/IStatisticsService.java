@@ -21,6 +21,7 @@ public interface IStatisticsService {
 	
 	Map<LocalDate, Double> getSaleOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd);
 	
-	void exportToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException;
-
+	void exportWeightsByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException;
+	
+	void exportWeightsByProductByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException;
 }

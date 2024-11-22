@@ -157,7 +157,7 @@ public class StatisticsService implements IStatisticsService{
 	}
 	
 	@Override
-	public void exportToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
+	public void exportWeightsByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
 		Map<LocalDate, Double> saleOrderWeightByTimePeriod = getSaleOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
 		Map<LocalDate, Double> purchaseOrderWeightByTimePeriod = getPurchaseOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
 		List<LocalDate> keyDates = saleOrderWeightByTimePeriod.keySet().stream().sorted().toList();
@@ -172,5 +172,11 @@ public class StatisticsService implements IStatisticsService{
 		}
 		
 		statisticsPersistence.writeStatisticsToExcelFile(timePeriodType, fileRoute, stats);
+	}
+	
+	// todo: implement this
+	@Override
+	public void exportWeightsByProductByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
+	
 	}
 }
