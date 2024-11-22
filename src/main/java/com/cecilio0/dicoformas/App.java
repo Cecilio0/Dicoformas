@@ -42,6 +42,11 @@ public class App extends Application {
 		saleOrderService.loadOrders("./saleOrders.dat", FileType.DAT);
 		controller.setSaleOrderService(saleOrderService);
 		
+		// MonthInventoryService
+		IMonthInventoryService monthInventoryService = new MonthInventoryService(new MonthInventoryPersistence());
+		monthInventoryService.loadMonthInventory("./monthInventories.dat", FileType.DAT);
+		controller.setMonthInventoryService(monthInventoryService);
+		
 		// StatisticsService
 		IStatisticsService statisticsService = new StatisticsService(
 				new StatisticsPersistence(),

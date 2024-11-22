@@ -1,10 +1,7 @@
 package com.cecilio0.dicoformas.controllers;
 
 import com.cecilio0.dicoformas.models.TimePeriodType;
-import com.cecilio0.dicoformas.services.IProductService;
-import com.cecilio0.dicoformas.services.IPurchaseOrderService;
-import com.cecilio0.dicoformas.services.ISaleOrderService;
-import com.cecilio0.dicoformas.services.IStatisticsService;
+import com.cecilio0.dicoformas.services.*;
 import com.cecilio0.dicoformas.utils.FileType;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -42,6 +39,9 @@ public class MainWindowController {
 	
 	@Setter
 	private ISaleOrderService saleOrderService;
+	
+	@Setter
+	private IMonthInventoryService monthInventoryService;
 	
 	private IStatisticsService statisticsService;
 	
@@ -265,6 +265,47 @@ public class MainWindowController {
 	}
 	
 	@FXML
+	private void loadMonthInventory(ActionEvent event) {
+		try {
+			File file = chooseFile("Abrir archivo de Inventario", true, true);
+			
+			if (file == null)
+				return;
+			
+			Alert alert;
+			try {
+				monthInventoryService.loadMonthInventory(file.getAbsolutePath(), FileType.EXCEL);
+				
+				monthInventoryService.saveMonthInventory("./monthInventories.dat");
+				
+				alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("Carga de Inventarios");
+				alert.setHeaderText(null);
+				alert.setContentText("Inventario cargado correctamente.");
+				
+				monthInventoryService.getMonthInventories().forEach((key, value) -> {
+					System.out.println(key);
+					System.out.println(value.getProductAmounts());
+					value.getProductAmounts().forEach((k, v) -> System.out.println("\t" + k + " -> " + v));
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+				alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Error al cargar Inventarios");
+				alert.setHeaderText(null);
+				alert.setContentText("Error al cargar Inventarios. Por favor, revise que haya seleccionado el archivo correcto.");
+			}
+			alert.showAndWait();
+			displayLineChart();
+		} catch (Exception e) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Error al cargar Inventarios");
+			alert.setHeaderText(null);
+			alert.setContentText(e.getMessage());
+		}
+	}
+	
+	@FXML
 	private void exportWeightsByMonthToExcel(ActionEvent event) {
 		try {
 			TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
@@ -317,6 +358,7 @@ public class MainWindowController {
 		}
 	}
 	
+	@FXML
 	private void exportWeightByProductsByMonthToExcel(ActionEvent event) {
 		try {
 			TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;

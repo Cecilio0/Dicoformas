@@ -58,10 +58,12 @@
             <MenuItem mnemonicParsing="false" onAction="#loadSaleProducts" text="Cargar PT" />
             <MenuItem mnemonicParsing="false" onAction="#loadSaleOrders" text="Cargar Pedidos PT" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadMonthInventory" text="Cargar Inventario" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
                   <Menu mnemonicParsing="false" text="Exportar a Excel">
                      <items>
-                        <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Pesos por mes" />
-                        <MenuItem mnemonicParsing="false" onAction="#exportToExcel" text="Pesos por producto por mes" />
+                        <MenuItem mnemonicParsing="false" onAction="#exportWeightsByMonthToExcel" text="Pesos por mes" />
+                        <MenuItem mnemonicParsing="false" onAction="#exportWeightByProductsByMonthToExcel" text="Pesos por producto por mes" />
                      </items>
                   </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
