@@ -249,6 +249,7 @@ public class MainWindowController {
 				alert.setHeaderText(null);
 				alert.setContentText("Pedidos PT cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
 			} catch (Exception e) {
+				e.printStackTrace();
 				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar pedidos PT");
 				alert.setHeaderText(null);
@@ -283,7 +284,6 @@ public class MainWindowController {
 				alert.setHeaderText(null);
 				alert.setContentText("Inventario cargado correctamente.");
 			} catch (Exception e) {
-				e.printStackTrace();
 				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar Inventarios");
 				alert.setHeaderText(null);

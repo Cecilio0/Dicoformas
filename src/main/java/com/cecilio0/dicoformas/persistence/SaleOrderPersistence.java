@@ -30,8 +30,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 		keys.add("FECHA"); // Order date
 		keys.add("CODIGO"); // Order product code
 		keys.add("NOMBRE"); // In case the product code is not registered
-		// todo: uncomment as soon as possible
-//		keys.add("DETALLE"); // In case the product has code 1200
+		keys.add("DETALLE"); // In case the product has code 1200
 		keys.add("CANTIDAD"); // How many of the product were bought
 		keys.add("VALOR"); // Price of the product being detailed
 		
@@ -56,8 +55,10 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 			}
 		}
 		
-		if (keyPositions.size() != keys.size())
-			throw new IOException("The keys were not found in the excel file");
+		if (keyPositions.size() != keys.size()){
+			if (!keyPositions.containsKey("DETALLE") && keyPositions.size() != keys.size() - 1)
+				throw new IOException("The keys were not found in the excel file");
+		}
 		
 		Map<Integer, SaleOrderModel> saleOrders = new HashMap<>();
 		Row currentRow;
@@ -104,29 +105,30 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 						.add(new ProductOrder(
 								products.get(productCode),
 								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
+				
 			} else {
-				// todo: uncomment all of this and remove the continue statement
-				// Temp for testing purposes
-				continue;
+				// Cannot get weight of the special product
+				if(!keyPositions.containsKey("DETALLE"))
+					continue;
 				
 				// Get weight of special product
-//				String detail = currentRow.getCell(keyPositions.get("DETALLE")).getStringCellValue().trim();
-//				if(detail.indexOf('(') != -1 && detail.indexOf(')') != -1){
-//					String substring = detail.substring(detail.lastIndexOf('('), detail.lastIndexOf(')'));
-//					if(NumberUtils.isCreatable(substring))
-//						weightKG = Double.parseDouble(substring);
-//				}
-//
-//				saleOrder.getProductOrders()
-//						.add(new ProductOrder(
-//								ProductModel.builder()
-//										.type(ProductType.SALE)
-//										.code(1200)
-//										.weightKG(weightKG)
-//										.name(currentRow.getCell(keyPositions.get("NOMBRE")).getStringCellValue().trim())
-//										.price(currentRow.getCell(keyPositions.get("VALOR")).getNumericCellValue())
-//										.build(),
-//								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
+				String detail = currentRow.getCell(keyPositions.get("DETALLE")).getStringCellValue().trim();
+				if(detail.indexOf('(') != -1 && detail.indexOf(')') != -1){
+					String substring = detail.substring(detail.lastIndexOf('('), detail.lastIndexOf(')'));
+					if(NumberUtils.isCreatable(substring))
+						weightKG = Double.parseDouble(substring);
+				}
+
+				saleOrder.getProductOrders()
+						.add(new ProductOrder(
+								ProductModel.builder()
+										.type(ProductType.SALE)
+										.code(1200)
+										.weightKG(weightKG)
+										.name(currentRow.getCell(keyPositions.get("NOMBRE")).getStringCellValue().trim())
+										.price(currentRow.getCell(keyPositions.get("VALOR")).getNumericCellValue())
+										.build(),
+								(int) currentRow.getCell(keyPositions.get("CANTIDAD")).getNumericCellValue()));
 			}
 			
 			saleOrders.put(orderCode, saleOrder);
