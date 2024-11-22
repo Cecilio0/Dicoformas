@@ -249,7 +249,6 @@ public class MainWindowController {
 				alert.setHeaderText(null);
 				alert.setContentText("Pedidos PT cargados correctamente. Se cargaron " + saleOrderService.getOrders().size() + " pedidos.");
 			} catch (Exception e) {
-				e.printStackTrace();
 				alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Error al cargar pedidos PT");
 				alert.setHeaderText(null);
@@ -431,10 +430,11 @@ public class MainWindowController {
 	
 	// Method to create and display the LineChart
 	private void displayLineChart() {
-		Map<LocalDate, Double> saleOrderData, purchaseOrderData;
+		Map<LocalDate, Double> saleOrderData, purchaseOrderData, inventoryData, saleOrderPlusInventoryData;
 		TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
 		saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
 		purchaseOrderData = statisticsService.getPurchaseOrderWeightByTimePeriod(timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+		inventoryData = statisticsService.getMonthlyInventoryWeightByTimePeriod(timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
 		
 		// Clear any existing data in the chart
 		lineChart.getData().clear();
@@ -461,13 +461,29 @@ public class MainWindowController {
 			purchaseOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), purchaseOrderData.get(keys.get(i))));
 		}
 		
+		// Create the first dataset for Inventory
+		XYChart.Series<String, Number> inventorySeries = new XYChart.Series<>();
+		inventorySeries.setName("Inventario");
+		
+		for (int i = 0; i < keys.size(); i++) {
+			inventorySeries.getData().add(new XYChart.Data<>(keyStrings.get(i), inventoryData.get(keys.get(i))));
+		}
+		
+		// Create the first dataset for saleOrderPlusInventory
+		XYChart.Series<String, Number> saleOrderPlusInventorySeries = new XYChart.Series<>();
+		saleOrderPlusInventorySeries.setName("Inventario + Ventas PT");
+		
+		for (int i = 0; i < keys.size(); i++) {
+			saleOrderPlusInventorySeries.getData().add(new XYChart.Data<>(keyStrings.get(i), saleOrderData.get(keys.get(i)) + inventoryData.get(keys.get(i))));
+		}
+		
 		// Update the X Axis with the new keys
 		CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
 		xAxis.getCategories().clear();
 		xAxis.getCategories().addAll(keyStrings);
 		
 		// Add both datasets to the existing LineChart
-		lineChart.getData().addAll(saleOrderSeries, purchaseOrderSeries);
+		lineChart.getData().addAll(saleOrderSeries, purchaseOrderSeries, inventorySeries, saleOrderPlusInventorySeries);
 		
 		// Add tooltips to the data points
 		DecimalFormat df = new DecimalFormat("#,###.00");
