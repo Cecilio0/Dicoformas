@@ -282,12 +282,6 @@ public class MainWindowController {
 				alert.setTitle("Carga de Inventarios");
 				alert.setHeaderText(null);
 				alert.setContentText("Inventario cargado correctamente.");
-				
-				monthInventoryService.getMonthInventories().forEach((key, value) -> {
-					System.out.println(key);
-					System.out.println(value.getProductAmounts());
-					value.getProductAmounts().forEach((k, v) -> System.out.println("\t" + k + " -> " + v));
-				});
 			} catch (Exception e) {
 				e.printStackTrace();
 				alert = new Alert(Alert.AlertType.ERROR);

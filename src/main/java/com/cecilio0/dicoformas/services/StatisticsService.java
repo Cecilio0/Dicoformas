@@ -17,18 +17,21 @@ public class StatisticsService implements IStatisticsService{
 	private final ISaleOrderService saleOrderService;
 	private final IProductService purchaseProductService;
 	private final IPurchaseOrderService purchaseOrderService;
+	private final IMonthInventoryService monthInventoryService;
 	private final IStatisticsPersistence statisticsPersistence;
 
 	public StatisticsService(IStatisticsPersistence statisticsPersistence,
 							 IProductService saleProductService,
 							 ISaleOrderService saleOrderService,
 							 IProductService purchaseProductService,
-							 IPurchaseOrderService purchaseOrderService) {
+							 IPurchaseOrderService purchaseOrderService,
+							 IMonthInventoryService monthInventoryService) {
 		this.statisticsPersistence = statisticsPersistence;
 		this.saleProductService = saleProductService;
 		this.saleOrderService = saleOrderService;
 		this.purchaseProductService = purchaseProductService;
 		this.purchaseOrderService = purchaseOrderService;
+		this.monthInventoryService = monthInventoryService;
 	}
 	
 	@Override
@@ -69,23 +72,7 @@ public class StatisticsService implements IStatisticsService{
 	public Map<LocalDate, Double> getPurchaseOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) {
 		Map<LocalDate, Double> result = new HashMap<>();
 		
-		List<LocalDate> keyDates = new ArrayList<>();
-		LocalDate date;
-		if(timePeriodType.equals(TimePeriodType.MONTH)){
-			date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
-			while(date.isBefore(periodEnd)){
-				keyDates.add(date);
-				date = date.plusMonths(1);
-			}
-			
-		} else {
-			date = LocalDate.of(periodStart.getYear(), 1, 1);
-			while(date.isBefore(periodEnd)){
-				keyDates.add(date);
-				date = date.plusYears(1);
-			}
-		}
-		keyDates.add(date);
+		List<LocalDate> keyDates = getKeyDates(timePeriodType, periodStart, periodEnd);
 		
 		Map<Integer, ProductModel> products = purchaseProductService.getProducts();
 		for (LocalDate keyDate : keyDates) {
@@ -115,22 +102,7 @@ public class StatisticsService implements IStatisticsService{
 	public Map<LocalDate, Double> getSaleOrderWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) {
 		Map<LocalDate, Double> result = new HashMap<>();
 		
-		List<LocalDate> keyDates = new ArrayList<>();
-		LocalDate date;
-		if(timePeriodType == TimePeriodType.MONTH){
-			date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
-			while(date.isBefore(periodEnd)){
-				keyDates.add(date);
-				date = date.plusMonths(1);
-			}
-		} else {
-			date = LocalDate.of(periodStart.getYear(), 1, 1);
-			while(date.isBefore(periodEnd)){
-				keyDates.add(date);
-				date = date.plusYears(1);
-			}
-		}
-		keyDates.add(date);
+		List<LocalDate> keyDates = getKeyDates(timePeriodType, periodStart, periodEnd);
 		
 		Map<Integer, ProductModel> products = saleProductService.getProducts();
 		for (LocalDate keyDate : keyDates) {
@@ -157,9 +129,40 @@ public class StatisticsService implements IStatisticsService{
 	}
 	
 	@Override
+	public Map<LocalDate, Double> getMonthlyInventoryWeightByTimePeriod(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) {
+		Map<LocalDate, Double> result = new HashMap<>();
+		
+		List<LocalDate> keyDates = getKeyDates(timePeriodType, periodStart, periodEnd);
+		
+		for(LocalDate keyDate : keyDates){
+			double weight = monthInventoryService.getMonthInventories().values().stream().filter(
+					monthInventory -> (timePeriodType.equals(TimePeriodType.YEAR) || monthInventory.getDate().getMonth() == keyDate.getMonth())
+							&& monthInventory.getDate().getYear() == keyDate.getYear()
+			).reduce(
+					0.0,
+					(totalWeight, monthInventory) -> totalWeight + monthInventory.getProductAmounts().entrySet().stream().reduce(
+							0.0,
+							(subtotal, productAmount) -> {
+								double productWeight = 0;
+								if(saleProductService.getProducts().containsKey(productAmount.getKey()))
+									productWeight = saleProductService.getProducts().get(productAmount.getKey()).getWeightKG();
+								else if(purchaseProductService.getProducts().containsKey(productAmount.getKey()))
+									productWeight = purchaseProductService.getProducts().get(productAmount.getKey()).getWeightKG();
+								return subtotal + productAmount.getValue() * productWeight;
+							},
+							Double::sum),
+					Double::sum);
+			result.put(keyDate, weight);
+		}
+		
+		return result;
+	}
+	
+	@Override
 	public void exportWeightsByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
 		Map<LocalDate, Double> saleOrderWeightByTimePeriod = getSaleOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
 		Map<LocalDate, Double> purchaseOrderWeightByTimePeriod = getPurchaseOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
+		Map<LocalDate, Double> monthlyInventoryWeightByTimePeriod = getMonthlyInventoryWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
 		List<LocalDate> keyDates = saleOrderWeightByTimePeriod.keySet().stream().sorted().toList();
 		
 		List<WeightStatsModel> stats = new ArrayList<>();
@@ -168,6 +171,7 @@ public class StatisticsService implements IStatisticsService{
 					.date(keyDate)
 					.saleOrderWeight(saleOrderWeightByTimePeriod.get(keyDate))
 					.purchaseOrderWeight(purchaseOrderWeightByTimePeriod.get(keyDate))
+					.monthInventoryWeight(monthlyInventoryWeightByTimePeriod.get(keyDate))
 					.build());
 		}
 		
@@ -178,5 +182,25 @@ public class StatisticsService implements IStatisticsService{
 	@Override
 	public void exportWeightsByProductByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
 	
+	}
+	
+	private List<LocalDate> getKeyDates(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd){
+		List<LocalDate> keyDates = new ArrayList<>();
+		LocalDate date;
+		if(timePeriodType == TimePeriodType.MONTH){
+			date = LocalDate.of(periodStart.getYear(), periodStart.getMonth(), 1);
+			while(date.isBefore(periodEnd)){
+				keyDates.add(date);
+				date = date.plusMonths(1);
+			}
+		} else {
+			date = LocalDate.of(periodStart.getYear(), 1, 1);
+			while(date.isBefore(periodEnd)){
+				keyDates.add(date);
+				date = date.plusYears(1);
+			}
+		}
+		keyDates.add(date);
+		return keyDates;
 	}
 }

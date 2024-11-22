@@ -11,4 +11,5 @@ public class WeightStatsModel {
 	private LocalDate date;
 	private double saleOrderWeight;
 	private double purchaseOrderWeight;
+	private double monthInventoryWeight;
 }

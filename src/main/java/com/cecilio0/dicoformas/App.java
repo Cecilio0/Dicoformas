@@ -53,7 +53,8 @@ public class App extends Application {
 				saleProductService,
 				saleOrderService,
 				purchaseProductService,
-				purchaseOrderService
+				purchaseOrderService,
+				monthInventoryService
 		);
 		controller.setStatisticsService(statisticsService);
 		

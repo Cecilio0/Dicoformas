@@ -21,6 +21,8 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		Font boldFont = workbook.createFont();
 		boldFont.setBold(true);
 		
+		int columnCount = 4;
+		
 		// Company
 		Cell companyCell = sheet.createRow(0).createCell(0);
 		companyCell.setCellValue("Empresa : DICOFORMAS S.A.S.");
@@ -31,7 +33,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		companyStyle.setFont(boldFont);
 		companyCell.setCellStyle(companyStyle);
 		
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnCount-1));
 		
 		// NIT
 		Cell nitCell = sheet.createRow(1).createCell(0);
@@ -43,7 +45,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		nitStyle.setFont(boldFont);
 		nitCell.setCellStyle(nitStyle);
 		
-		sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 2));
+		sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, columnCount-1));
 		
 		// Title
 		Row titleRow = sheet.createRow(3);
@@ -60,7 +62,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		titleStyle.setBorderRight(BorderStyle.THIN);
 		titleStyle.setBorderTop(BorderStyle.THIN);
 		
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < columnCount; i++) {
 			Cell mergedCell = titleRow.getCell(i);
 			if (mergedCell == null) {
 				mergedCell = titleRow.createCell(i);
@@ -68,7 +70,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 			mergedCell.setCellStyle(titleStyle);
 		}
 		
-		sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, 2));
+		sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, columnCount-1));
 		
 		// Headers
 		CellStyle headerStyle = workbook.createCellStyle();
@@ -93,6 +95,10 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		purchaseOrderWeightTitleCell.setCellValue("PESO MP");
 		purchaseOrderWeightTitleCell.setCellStyle(headerStyle);
 		
+		Cell inventoryWeightTitleCell = headers.createCell(3);
+		inventoryWeightTitleCell.setCellValue("PESO INVENTARIO");
+		inventoryWeightTitleCell.setCellStyle(headerStyle);
+		
 		// Data
 		CellStyle dataStyle = workbook.createCellStyle();
 		dataStyle.setBorderTop(BorderStyle.THIN);
@@ -115,12 +121,17 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 			Cell purchaseOrderWeightCell = row.createCell(2);
 			purchaseOrderWeightCell.setCellValue(stat.getPurchaseOrderWeight());
 			purchaseOrderWeightCell.setCellStyle(dataStyle);
+			
+			Cell inventoryWeightCell = row.createCell(3);
+			inventoryWeightCell.setCellValue(stat.getMonthInventoryWeight());
+			inventoryWeightCell.setCellStyle(dataStyle);
 		}
 		
-//		// Resize columns, may not be necessary
-//		for (int i = 0; i < 3; i++) {
-//			sheet.autoSizeColumn(i);
-//		}
+		// Resize columns, may not be necessary
+		for (int i = 0; i < columnCount; i++) {
+			sheet.autoSizeColumn(i);
+			sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 200);
+		}
 		
 		// Write workbook to file
 		FileOutputStream fileOut = new FileOutputStream(fileRoute);
