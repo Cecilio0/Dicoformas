@@ -80,7 +80,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		
 		ExcelUtil.writeTitles(workbook, sheet, title, new byte[]{(byte) 150, (byte) 206, (byte) 239}, columnCount);
 		
-		ExcelUtil.writeHeaders(workbook, sheet, "FECHA", "CODIGO", "NOMBRE", "PRECIO1", "VENTAS", "TOTAL", "PESO", "PESO TOTAL");
+		ExcelUtil.writeHeaders(workbook, sheet, "FECHA", "CODIGO", "NOMBRE", "PRECIO1", "CANT.", "TOTAL", "PESO", "PESO TOTAL");
 		
 		// Data
 		CellStyle dataStyle = workbook.createCellStyle();
@@ -131,7 +131,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 				weightCell.setCellStyle(dataStyle);
 				
 				Cell totalWeightCell = row.createCell(7);
-				totalWeightCell.setCellFormula("F" + index + "*G" + index);
+				totalWeightCell.setCellFormula("E" + index + "*G" + index);
 				totalWeightCell.setCellStyle(dataStyle);
 			}
 		}
