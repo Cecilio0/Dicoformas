@@ -35,6 +35,7 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -112,6 +113,43 @@
                </children>
             </HBox>
          </bottom>
+         <right>
+            <BorderPane maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <center>
+                  <VBox alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="200.0">
+                           <children>
+                              <CheckBox fx:id="saleOrderCheckBox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Ventas PT" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="200.0">
+                           <children>
+                              <CheckBox fx:id="purchaseOrderCheckBox" mnemonicParsing="false" text="Compras MP" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="200.0">
+                           <children>
+                              <CheckBox fx:id="inventoryCheckBox" mnemonicParsing="false" text="Inventario" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="200.0">
+                           <children>
+                              <CheckBox fx:id="saleOrderPlusInventoryCheckBox" mnemonicParsing="false" text="Inventario + Ventas PT" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </center>
+               <top>
+                  <VBox alignment="BOTTOM_CENTER" maxWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Activar y desactivar gráficas visibles" />
+                     </children>
+                  </VBox>
+               </top>
+            </BorderPane>
+         </right>
       </BorderPane>
   </children>
 </VBox>
