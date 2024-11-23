@@ -64,7 +64,7 @@
                   <Menu mnemonicParsing="false" text="Exportar a Excel">
                      <items>
                         <MenuItem mnemonicParsing="false" onAction="#exportWeightsByMonthToExcel" text="Pesos por mes" />
-                        <MenuItem mnemonicParsing="false" onAction="#exportWeightByProductsByMonthToExcel" text="Pesos por producto por mes" />
+                        <MenuItem mnemonicParsing="false" onAction="#exportProductsSoldByMonthToExcel" text="Ventas por producto por mes" />
                      </items>
                   </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />

@@ -1,8 +1,6 @@
 package com.cecilio0.dicoformas.services;
 
-import com.cecilio0.dicoformas.models.ProductModel;
-import com.cecilio0.dicoformas.models.TimePeriodType;
-import com.cecilio0.dicoformas.models.WeightStatsModel;
+import com.cecilio0.dicoformas.models.*;
 import com.cecilio0.dicoformas.persistence.IStatisticsPersistence;
 
 import java.io.IOException;
@@ -163,7 +161,7 @@ public class StatisticsService implements IStatisticsService{
 		Map<LocalDate, Double> saleOrderWeightByTimePeriod = getSaleOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
 		Map<LocalDate, Double> purchaseOrderWeightByTimePeriod = getPurchaseOrderWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
 		Map<LocalDate, Double> monthlyInventoryWeightByTimePeriod = getMonthlyInventoryWeightByTimePeriod(timePeriodType, periodStart, periodEnd);
-		List<LocalDate> keyDates = saleOrderWeightByTimePeriod.keySet().stream().sorted().toList();
+		List<LocalDate> keyDates = getKeyDates(timePeriodType, periodStart, periodEnd);
 		
 		List<WeightStatsModel> stats = new ArrayList<>();
 		for (LocalDate keyDate : keyDates) {
@@ -178,10 +176,35 @@ public class StatisticsService implements IStatisticsService{
 		statisticsPersistence.writeWeightsByMonthToExcelFile(timePeriodType, fileRoute, stats);
 	}
 	
-	// todo: implement this
 	@Override
-	public void exportWeightsByProductByMonthToExcelFile(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
-	
+	public void exportProductsSoldByMonthToExcel(String fileRoute, TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd) throws IOException {
+		List<LocalDate> keyDates = getKeyDates(timePeriodType, periodStart, periodEnd);
+		
+		List<ProductsSoldByMonthModel> data = new ArrayList<>();
+		for(LocalDate keyDate : keyDates){
+			Map<Integer, ProductOrder> productsSold = new HashMap<>();
+			
+			for(SaleOrderModel saleOrder : saleOrderService.getOrders().values()){
+				if((timePeriodType.equals(TimePeriodType.YEAR) || saleOrder.getOrderPlacedDate().getMonth() == keyDate.getMonth())
+						&& saleOrder.getOrderPlacedDate().getYear() == keyDate.getYear()){
+					for(ProductOrder productOrder : saleOrder.getProductOrders()){
+						if(productsSold.containsKey(productOrder.getProduct().getCode())){
+							ProductOrder currentProductOrder = productsSold.get(productOrder.getProduct().getCode());
+							currentProductOrder.setAmount(currentProductOrder.getAmount() + productOrder.getAmount());
+						} else {
+							productsSold.put(productOrder.getProduct().getCode(), new ProductOrder(productOrder.getProduct(), productOrder.getAmount()));
+						}
+					}
+				}
+			}
+			
+			data.add(ProductsSoldByMonthModel.builder()
+					.date(keyDate)
+					.productsSold(productsSold)
+					.build());
+		}
+		
+		statisticsPersistence.writeProductsSoldByMonthToExcelFile(timePeriodType, fileRoute, data);
 	}
 	
 	private List<LocalDate> getKeyDates(TimePeriodType timePeriodType, LocalDate periodStart, LocalDate periodEnd){

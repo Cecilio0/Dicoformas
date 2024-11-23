@@ -373,15 +373,15 @@ public class MainWindowController {
 	}
 	
 	@FXML
-	private void exportWeightByProductsByMonthToExcel(ActionEvent event) {
+	private void exportProductsSoldByMonthToExcel(ActionEvent event) {
 		try {
 			TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
 			
 			String title;
 			if(timePeriodType == TimePeriodType.MONTH)
-				title = "Exportar Pesos Por Mes Por Producto a Excel";
+				title = "Exportar Ventas Por Mes Por Producto a Excel";
 			else
-				title = "Exportar Pesos Por Año Por Producto a Excel";
+				title = "Exportar Ventas Por Año Por Producto a Excel";
 			
 			File file = chooseFile(title, false, false);
 			
@@ -390,7 +390,7 @@ public class MainWindowController {
 			
 			Alert alert;
 			try {
-				statisticsService.exportWeightsByProductByMonthToExcelFile(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
+				statisticsService.exportProductsSoldByMonthToExcel(file.getAbsolutePath(), timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
 				
 				alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("Exportar a Excel");
@@ -563,6 +563,7 @@ public class MainWindowController {
 			purchaseOrderService.saveOrders("./purchaseOrders.dat", FileType.DAT);
 			saleProductService.saveProducts("./saleProducts.dat", FileType.DAT);
 			saleOrderService.saveOrders("./saleOrders.dat", FileType.DAT);
+			monthInventoryService.saveMonthInventory("./monthInventories.dat");
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al guardar los datos");
