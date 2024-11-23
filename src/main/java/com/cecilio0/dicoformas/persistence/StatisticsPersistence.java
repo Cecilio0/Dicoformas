@@ -21,7 +21,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		Font boldFont = workbook.createFont();
 		boldFont.setBold(true);
 		
-		int columnCount = 4;
+		int columnCount = 5;
 		
 		// Company
 		Cell companyCell = sheet.createRow(0).createCell(0);
@@ -99,6 +99,10 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		inventoryWeightTitleCell.setCellValue("PESO INVENTARIO");
 		inventoryWeightTitleCell.setCellStyle(headerStyle);
 		
+		Cell saleOrderPlusInventoryWeightTitleCell = headers.createCell(4);
+		saleOrderPlusInventoryWeightTitleCell.setCellValue("PESO PT + PESO INVENTARIO");
+		saleOrderPlusInventoryWeightTitleCell.setCellStyle(headerStyle);
+		
 		// Data
 		CellStyle dataStyle = workbook.createCellStyle();
 		dataStyle.setBorderTop(BorderStyle.THIN);
@@ -125,9 +129,13 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 			Cell inventoryWeightCell = row.createCell(3);
 			inventoryWeightCell.setCellValue(stat.getMonthInventoryWeight());
 			inventoryWeightCell.setCellStyle(dataStyle);
+			
+			Cell saleOrderPlusInventoryWeightCell = row.createCell(4);
+			saleOrderPlusInventoryWeightCell.setCellFormula("B" + index + "+D" + index);
+			saleOrderPlusInventoryWeightCell.setCellStyle(dataStyle);
 		}
 		
-		// Resize columns, may not be necessary
+		// Resize columns
 		for (int i = 0; i < columnCount; i++) {
 			sheet.autoSizeColumn(i);
 			sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 200);
