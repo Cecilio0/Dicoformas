@@ -175,7 +175,7 @@ public class StatisticsService implements IStatisticsService{
 					.build());
 		}
 		
-		statisticsPersistence.writeStatisticsToExcelFile(timePeriodType, fileRoute, stats);
+		statisticsPersistence.writeWeightsByMonthToExcelFile(timePeriodType, fileRoute, stats);
 	}
 	
 	// todo: implement this

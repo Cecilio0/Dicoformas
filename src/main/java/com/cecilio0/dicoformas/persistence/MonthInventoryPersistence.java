@@ -1,9 +1,8 @@
 package com.cecilio0.dicoformas.persistence;
 
 import com.cecilio0.dicoformas.models.MonthInventoryModel;
-import com.cecilio0.dicoformas.utils.ExcelReader;
+import com.cecilio0.dicoformas.utils.ExcelUtil;
 import com.cecilio0.dicoformas.utils.Month;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.util.*;
 public class MonthInventoryPersistence implements IMonthInventoryPersistence {
 	@Override
 	public MonthInventoryModel loadMonthInventoryFromExcelFile(String fileRoute) throws IOException {
-		Workbook workbook = ExcelReader.getWorkbookFromExcelFile(fileRoute);
+		Workbook workbook = ExcelUtil.getWorkbookFromExcelFile(fileRoute);
 		
 		Sheet firstSheet = workbook.getSheetAt(0);
 		

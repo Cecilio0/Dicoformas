@@ -5,7 +5,7 @@ import com.cecilio0.dicoformas.models.ProductOrder;
 import com.cecilio0.dicoformas.models.ProductType;
 import com.cecilio0.dicoformas.models.SaleOrderModel;
 import com.cecilio0.dicoformas.utils.DatUtil;
-import com.cecilio0.dicoformas.utils.ExcelReader;
+import com.cecilio0.dicoformas.utils.ExcelUtil;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -19,7 +19,7 @@ public class SaleOrderPersistence implements ISaleOrderPersistence {
 	
 	@Override
 	public Map<Integer, SaleOrderModel> loadSaleOrdersFromExcelFile(String fileRoute, Map<Integer, ProductModel> products) throws IOException {
-		Workbook workbook = ExcelReader.getWorkbookFromExcelFile(fileRoute);
+		Workbook workbook = ExcelUtil.getWorkbookFromExcelFile(fileRoute);
 		
 		Sheet firstSheet = workbook.getSheetAt(0);
 		

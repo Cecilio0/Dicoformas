@@ -2,7 +2,7 @@ package com.cecilio0.dicoformas.persistence;
 
 import com.cecilio0.dicoformas.models.*;
 import com.cecilio0.dicoformas.utils.DatUtil;
-import com.cecilio0.dicoformas.utils.ExcelReader;
+import com.cecilio0.dicoformas.utils.ExcelUtil;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.*;
 public class PurchaseOrderPersistence implements IPurchaseOrderPersistence {
 	@Override
 	public Map<Integer, PurchaseOrderModel> loadPurchaseOrdersFromExcelFile(String fileRoute, Map<Integer, ProductModel> products) throws IOException {
-		Workbook workbook = ExcelReader.getWorkbookFromExcelFile(fileRoute);
+		Workbook workbook = ExcelUtil.getWorkbookFromExcelFile(fileRoute);
 		
 		Sheet firstSheet = workbook.getSheetAt(0);
 		

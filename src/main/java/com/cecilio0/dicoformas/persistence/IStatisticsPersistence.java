@@ -7,5 +7,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IStatisticsPersistence {
-	void writeStatisticsToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<WeightStatsModel> stats) throws IOException;
+	void writeWeightsByMonthToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<WeightStatsModel> stats) throws IOException;
+	void writeWeightsByProductByMonthToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<WeightStatsModel> stats) throws IOException;
 }

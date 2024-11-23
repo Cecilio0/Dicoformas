@@ -1,7 +1,7 @@
 package com.cecilio0.dicoformas.persistence;
 
 import com.cecilio0.dicoformas.models.ProductModel;
-import com.cecilio0.dicoformas.utils.ExcelReader;
+import com.cecilio0.dicoformas.utils.ExcelUtil;
 import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 
@@ -12,7 +12,7 @@ import java.util.*;
 public class PurchaseProductPersistence implements IProductPersistence {
 	@Override
 	public Sheet getSheet(String fileRoute) throws IOException {
-		Workbook workbook = ExcelReader.getWorkbookFromExcelFile(fileRoute);
+		Workbook workbook = ExcelUtil.getWorkbookFromExcelFile(fileRoute);
 		
 		Sheet firstSheet = workbook.getSheet("MATERIA PRIMA");
 		if(firstSheet == null) {

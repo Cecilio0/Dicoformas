@@ -2,9 +2,8 @@ package com.cecilio0.dicoformas.persistence;
 
 import com.cecilio0.dicoformas.models.TimePeriodType;
 import com.cecilio0.dicoformas.models.WeightStatsModel;
+import com.cecilio0.dicoformas.utils.ExcelUtil;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
@@ -13,95 +12,17 @@ import java.util.List;
 
 public class StatisticsPersistence implements IStatisticsPersistence {
 	@Override
-	public void writeStatisticsToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<WeightStatsModel> stats) throws IOException {
+	public void writeWeightsByMonthToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<WeightStatsModel> stats) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
 		
 		Sheet sheet = workbook.createSheet("Pesos por Fecha");
-		
-		Font boldFont = workbook.createFont();
-		boldFont.setBold(true);
+		String title = "PESOS PT Y MP POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
 		
 		int columnCount = 5;
 		
-		// Company
-		Cell companyCell = sheet.createRow(0).createCell(0);
-		companyCell.setCellValue("Empresa : DICOFORMAS S.A.S.");
+		ExcelUtil.writeTitles(workbook, sheet, title, new byte[]{(byte) 242, (byte) 206, (byte) 239}, columnCount);
 		
-		CellStyle companyStyle = workbook.createCellStyle();
-		companyStyle.setAlignment(HorizontalAlignment.CENTER);
-		companyStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-		companyStyle.setFont(boldFont);
-		companyCell.setCellStyle(companyStyle);
-		
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnCount-1));
-		
-		// NIT
-		Cell nitCell = sheet.createRow(1).createCell(0);
-		nitCell.setCellValue("NIT : 901.668.970-5");
-		
-		CellStyle nitStyle = workbook.createCellStyle();
-		nitStyle.setAlignment(HorizontalAlignment.CENTER);
-		nitStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-		nitStyle.setFont(boldFont);
-		nitCell.setCellStyle(nitStyle);
-		
-		sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, columnCount-1));
-		
-		// Title
-		Row titleRow = sheet.createRow(3);
-		Cell titleCell = titleRow.createCell(0);
-		titleCell.setCellValue("PESOS PT Y MP POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO"));
-		
-		CellStyle titleStyle = workbook.createCellStyle();
-		titleStyle.setAlignment(HorizontalAlignment.CENTER);
-		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-		titleStyle.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 242, (byte) 206, (byte) 239}));
-		titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		titleStyle.setBorderBottom(BorderStyle.THIN);
-		titleStyle.setBorderLeft(BorderStyle.THIN);
-		titleStyle.setBorderRight(BorderStyle.THIN);
-		titleStyle.setBorderTop(BorderStyle.THIN);
-		
-		for (int i = 0; i < columnCount; i++) {
-			Cell mergedCell = titleRow.getCell(i);
-			if (mergedCell == null) {
-				mergedCell = titleRow.createCell(i);
-			}
-			mergedCell.setCellStyle(titleStyle);
-		}
-		
-		sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, columnCount-1));
-		
-		// Headers
-		CellStyle headerStyle = workbook.createCellStyle();
-		headerStyle.setAlignment(HorizontalAlignment.CENTER);
-		headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-		headerStyle.setFont(boldFont);
-		headerStyle.setBorderBottom(BorderStyle.THIN);
-		headerStyle.setBorderLeft(BorderStyle.THIN);
-		headerStyle.setBorderRight(BorderStyle.THIN);
-		headerStyle.setBorderTop(BorderStyle.THIN);
-		
-		Row headers = sheet.createRow(4);
-		Cell dateTitleCell = headers.createCell(0);
-		dateTitleCell.setCellValue("FECHA");
-		dateTitleCell.setCellStyle(headerStyle);
-		
-		Cell saleOrderWeightTitleCell = headers.createCell(1);
-		saleOrderWeightTitleCell.setCellValue("PESO PT");
-		saleOrderWeightTitleCell.setCellStyle(headerStyle);
-		
-		Cell purchaseOrderWeightTitleCell = headers.createCell(2);
-		purchaseOrderWeightTitleCell.setCellValue("PESO MP");
-		purchaseOrderWeightTitleCell.setCellStyle(headerStyle);
-		
-		Cell inventoryWeightTitleCell = headers.createCell(3);
-		inventoryWeightTitleCell.setCellValue("PESO INVENTARIO");
-		inventoryWeightTitleCell.setCellStyle(headerStyle);
-		
-		Cell saleOrderPlusInventoryWeightTitleCell = headers.createCell(4);
-		saleOrderPlusInventoryWeightTitleCell.setCellValue("PESO PT + PESO INVENTARIO");
-		saleOrderPlusInventoryWeightTitleCell.setCellStyle(headerStyle);
+		ExcelUtil.writeHeaders(workbook, sheet, "FECHA", "PESO PT", "PESO MP", "PESO INVENTARIO", "PESO PT + PESO INVENTARIO");
 		
 		// Data
 		CellStyle dataStyle = workbook.createCellStyle();
@@ -144,7 +65,20 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		// Write workbook to file
 		FileOutputStream fileOut = new FileOutputStream(fileRoute);
 		workbook.write(fileOut);
-		
 		workbook.close();
+	}
+	
+	@Override
+	public void writeWeightsByProductByMonthToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<WeightStatsModel> stats) throws IOException {
+		Workbook workbook = new XSSFWorkbook();
+		
+		Sheet sheet = workbook.createSheet("Pesos por Fecha");
+		String title = "PESOS PT Y MP POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
+		
+		int columnCount = 5;
+		
+		ExcelUtil.writeTitles(workbook, sheet, title, new byte[]{(byte) 242, (byte) 206, (byte) 239}, columnCount);
+		
+		ExcelUtil.writeHeaders(workbook, sheet, "FECHA", "PESO PT", "PESO MP", "PESO INVENTARIO", "PESO PT + PESO INVENTARIO");
 	}
 }
