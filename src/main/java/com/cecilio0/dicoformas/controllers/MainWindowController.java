@@ -6,10 +6,10 @@ import com.cecilio0.dicoformas.utils.FileType;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -43,7 +43,7 @@ public class MainWindowController {
 	private IStatisticsService statisticsService;
 	
 	@FXML
-	private LineChart<String, Number> lineChart;
+	private BarChart<String, Number> barChart;
 	
 	@FXML
 	private ChoiceBox<String> timePeriodTypeChoiceBox;
@@ -64,7 +64,10 @@ public class MainWindowController {
 	private CheckBox inventoryCheckBox;
 	
 	@FXML
-	private CheckBox saleOrderPlusInventoryCheckBox;
+	private CheckBox purchaseOrderMinusSaleOrderCheckBox;
+	
+	@FXML
+	private CheckBox calculatedInventoryCheckBox;
 	
 	public void setStageOnClose(Stage stage) {
 		stage.setOnCloseRequest(event -> saveAllData());
@@ -116,14 +119,16 @@ public class MainWindowController {
 		saleOrderCheckBox.setSelected(true);
 		purchaseOrderCheckBox.setSelected(true);
 		inventoryCheckBox.setSelected(true);
-		saleOrderPlusInventoryCheckBox.setSelected(true);
+		purchaseOrderMinusSaleOrderCheckBox.setSelected(true);
+		calculatedInventoryCheckBox.setSelected(true);
 		
 		saleOrderCheckBox.selectedProperty().addListener(this::updateLineChart);
 		purchaseOrderCheckBox.selectedProperty().addListener(this::updateLineChart);
 		inventoryCheckBox.selectedProperty().addListener(this::updateLineChart);
-		saleOrderPlusInventoryCheckBox.selectedProperty().addListener(this::updateLineChart);
+		purchaseOrderMinusSaleOrderCheckBox.selectedProperty().addListener(this::updateLineChart);
+		calculatedInventoryCheckBox.selectedProperty().addListener(this::updateLineChart);
 		
-		lineChart.getXAxis().setTickLabelRotation(90);
+		barChart.getXAxis().setTickLabelRotation(90);
 	}
 	
 	private void updateLineChart(ObservableValue<?> observableValue, Object oldValue, Object newValue) {
@@ -449,7 +454,7 @@ public class MainWindowController {
 	
 	////////////////////////////// CONTENT //////////////////////////////
 	
-	// Method to create and display the LineChart
+	// Method to create and display the barChart
 	private void displayLineChart() {
 		Map<LocalDate, Double> saleOrderData, purchaseOrderData, inventoryData;
 		TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
@@ -459,10 +464,10 @@ public class MainWindowController {
 		
 		List<XYChart.Series<String, Number>> datasets = new ArrayList<>();
 		// Clear any existing data in the chart
-		lineChart.getData().clear();
+		barChart.getData().clear();
 		
-		lineChart.getXAxis().setLabel(timePeriodTypeChoiceBox.getValue());
-		lineChart.getYAxis().setLabel("Peso (Kg)");
+		barChart.getXAxis().setLabel(timePeriodTypeChoiceBox.getValue());
+		barChart.getYAxis().setLabel("Peso (Kg)");
 		
 		List<LocalDate> keys = saleOrderData.keySet().stream().sorted().toList();
 		List<String> keyStrings = keys.stream().map( key -> key.toString().substring(0, timePeriodType == TimePeriodType.MONTH? 7: 4)).toList();
@@ -500,24 +505,39 @@ public class MainWindowController {
 			datasets.add(inventorySeries);
 		}
 		
-		XYChart.Series<String, Number> saleOrderPlusInventorySeries = new XYChart.Series<>();
-		if(saleOrderPlusInventoryCheckBox.selectedProperty().get()){
+		XYChart.Series<String, Number> purchaseOrderMinusSaleOrderSeries = new XYChart.Series<>();
+		if(purchaseOrderMinusSaleOrderCheckBox.selectedProperty().get()){
 			// Create the first dataset for saleOrderPlusInventory
-			saleOrderPlusInventorySeries.setName("Inventario + Ventas PT");
+			purchaseOrderMinusSaleOrderSeries.setName("Compras - Ventas");
 			
 			for (int i = 0; i < keys.size(); i++) {
-				saleOrderPlusInventorySeries.getData().add(new XYChart.Data<>(keyStrings.get(i), saleOrderData.get(keys.get(i)) + inventoryData.get(keys.get(i))));
+				purchaseOrderMinusSaleOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), purchaseOrderData.get(keys.get(i)) - saleOrderData.get(keys.get(i))));
 			}
-			datasets.add(saleOrderPlusInventorySeries);
+			datasets.add(purchaseOrderMinusSaleOrderSeries);
+		}
+		
+		XYChart.Series<String, Number> calculatedInventorySeries = new XYChart.Series<>();
+		if(calculatedInventoryCheckBox.selectedProperty().get()){
+			// Create the first dataset for calculatedInventory
+			calculatedInventorySeries.setName("Inventario Calculado");
+			LocalDate inventoryKey;
+			for (int i = 0; i < keys.size(); i++) {
+				inventoryKey = keys.get(i).minusMonths(1);
+				calculatedInventorySeries.getData().add(
+						new XYChart.Data<>(
+								keyStrings.get(i),
+								purchaseOrderData.get(keys.get(i)) - saleOrderData.get(keys.get(i)) + (keys.contains(inventoryKey)? inventoryData.get(inventoryKey): 0)));
+			}
+			datasets.add(calculatedInventorySeries);
 		}
 		
 		// Update the X Axis with the new keys
-		CategoryAxis xAxis = (CategoryAxis) lineChart.getXAxis();
+		CategoryAxis xAxis = (CategoryAxis) barChart.getXAxis();
 		xAxis.getCategories().clear();
 		xAxis.getCategories().addAll(keyStrings);
 		
-		// Add all existing datasets to the existing LineChart
-		lineChart.getData().addAll(datasets);
+		// Add all existing datasets to the existing barChart
+		barChart.getData().addAll(datasets);
 		
 		// Add tooltips to the data points
 		DecimalFormat df = new DecimalFormat("#,###.00");
@@ -538,6 +558,14 @@ public class MainWindowController {
 			}
 		}
 		
+		if(purchaseOrderMinusSaleOrderCheckBox.selectedProperty().get()){
+			for (XYChart.Data<String, Number> data : purchaseOrderMinusSaleOrderSeries.getData()) {
+				String formattedValue = df.format(data.getYValue().doubleValue());
+				Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + formattedValue + " Kg");
+				Tooltip.install(data.getNode(), tooltip);
+			}
+		}
+		
 		if(inventoryCheckBox.selectedProperty().get()){
 			for (XYChart.Data<String, Number> data : inventorySeries.getData()) {
 				String formattedValue = df.format(data.getYValue().doubleValue());
@@ -546,8 +574,8 @@ public class MainWindowController {
 			}
 		}
 		
-		if(saleOrderPlusInventoryCheckBox.selectedProperty().get()){
-			for (XYChart.Data<String, Number> data : saleOrderPlusInventorySeries.getData()) {
+		if(calculatedInventoryCheckBox.selectedProperty().get()){
+			for (XYChart.Data<String, Number> data : calculatedInventorySeries.getData()) {
 				String formattedValue = df.format(data.getYValue().doubleValue());
 				Tooltip tooltip = new Tooltip("Fecha: " + data.getXValue() + "\nPeso: " + formattedValue + " Kg");
 				Tooltip.install(data.getNode(), tooltip);

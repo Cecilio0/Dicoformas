@@ -17,13 +17,13 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		Workbook workbook = new XSSFWorkbook();
 		
 		Sheet sheet = workbook.createSheet("Pesos por Fecha");
-		String title = "PESOS PT Y MP POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
+		String title = "PESOS POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
 		
-		int columnCount = 5;
+		int columnCount = 6;
 		
 		ExcelUtil.writeTitles(workbook, sheet, title, new byte[]{(byte) 242, (byte) 206, (byte) 239}, columnCount);
 		
-		ExcelUtil.writeHeaders(workbook, sheet, "FECHA", "PESO PT", "PESO MP", "PESO INVENTARIO", "PESO PT + PESO INVENTARIO");
+		ExcelUtil.writeHeaders(workbook, sheet, "FECHA", "VENTAS", "COMPRAS", "COMPRAS - VENTAS", "INVENTARIO", "INVENTARIO CALCULADO");
 		
 		// Data
 		CellStyle dataStyle = workbook.createCellStyle();
@@ -48,13 +48,20 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 			purchaseOrderWeightCell.setCellValue(stat.getPurchaseOrderWeight());
 			purchaseOrderWeightCell.setCellStyle(dataStyle);
 			
-			Cell inventoryWeightCell = row.createCell(3);
+			Cell purchaseOrderMinusSaleOrderWeightCell = row.createCell(3);
+			purchaseOrderMinusSaleOrderWeightCell.setCellFormula("C" + index + "-B" + index);
+			purchaseOrderMinusSaleOrderWeightCell.setCellStyle(dataStyle);
+			
+			Cell inventoryWeightCell = row.createCell(4);
 			inventoryWeightCell.setCellValue(stat.getMonthInventoryWeight());
 			inventoryWeightCell.setCellStyle(dataStyle);
 			
-			Cell saleOrderPlusInventoryWeightCell = row.createCell(4);
-			saleOrderPlusInventoryWeightCell.setCellFormula("B" + index + "+D" + index);
-			saleOrderPlusInventoryWeightCell.setCellStyle(dataStyle);
+			Cell calculatedInventoryWeightCell = row.createCell(5);
+			if(index == 6)
+				calculatedInventoryWeightCell.setCellFormula("C" + index + "-B" + index);
+			else
+				calculatedInventoryWeightCell.setCellFormula("C" + index + "-B" + index + "+E" + (index-1));
+			calculatedInventoryWeightCell.setCellStyle(dataStyle);
 		}
 		
 		// Resize columns
@@ -73,8 +80,8 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 	public void writeProductsSoldByMonthToExcelFile(TimePeriodType timePeriodType, String fileRoute, List<ProductsSoldByMonthModel> stats) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
 		
-		Sheet sheet = workbook.createSheet("Pesos por Fecha");
-		String title = "PESOS PT Y MP POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
+		Sheet sheet = workbook.createSheet("Pesos de Productos por Fecha");
+		String title = "PESO PRODUCTOS POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
 		
 		int columnCount = 8;
 		
