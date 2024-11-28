@@ -27,6 +27,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		
 		// Data
 		CellStyle dataStyle = workbook.createCellStyle();
+		dataStyle.setDataFormat(workbook.createDataFormat().getFormat("0"));
 		dataStyle.setBorderTop(BorderStyle.THIN);
 		dataStyle.setBorderRight(BorderStyle.THIN);
 		dataStyle.setBorderBottom(BorderStyle.THIN);
