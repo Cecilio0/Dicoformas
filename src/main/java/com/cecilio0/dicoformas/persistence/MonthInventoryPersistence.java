@@ -24,7 +24,10 @@ public class MonthInventoryPersistence implements IMonthInventoryPersistence {
 			throw new RuntimeException("No se pudo leer el archivo correctamente");
 		
 		Row currentRow = rowIterator.next();
+		
 		String[] dateStringParts = currentRow.getCell(3).getStringCellValue().split(" ");
+		if (dateStringParts.length < 3)
+			dateStringParts = currentRow.getCell(4).getStringCellValue().split(" ");
 		
 		if(dateStringParts.length < 3)
 			throw new RuntimeException("El formato de la fecha no es el esperado");
@@ -55,7 +58,7 @@ public class MonthInventoryPersistence implements IMonthInventoryPersistence {
 		int numberOfCells = currentRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < numberOfCells; i++) {
 			Cell currentCell = currentRow.getCell(i);
-			if (keys.contains(currentCell.getStringCellValue())) {
+			if (currentCell != null && keys.contains(currentCell.getStringCellValue())) {
 				keyPositions.put(currentCell.getStringCellValue(), i);
 			}
 		}
