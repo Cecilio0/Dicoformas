@@ -61,7 +61,7 @@ public class App extends Application {
 		controller.setStageOnClose(primaryStage);
 		
 		// Set the scene and show the stage
-		Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/stats-icon.jpg")));
+		Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/icons/stats-icon.jpg")));
 		primaryStage.getIcons().add(icon);
 		
 		primaryStage.setScene(scene);
