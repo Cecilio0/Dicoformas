@@ -40,6 +40,7 @@ public class MainWindowController {
 	@Setter
 	private IMonthInventoryService monthInventoryService;
 	
+	@Setter
 	private IStatisticsService statisticsService;
 	
 	@FXML
@@ -71,11 +72,6 @@ public class MainWindowController {
 	
 	public void setStageOnClose(Stage stage) {
 		stage.setOnCloseRequest(event -> saveAllData());
-	}
-	
-	public void setStatisticsService(IStatisticsService service) {
-		this.statisticsService = service;
-		displayLineChart();
 	}
 	
 	////////////////////////////// MISC //////////////////////////////
@@ -135,7 +131,7 @@ public class MainWindowController {
 		if(Objects.equals(oldValue, newValue))
 			return;
 		
-		displayLineChart();
+		displayBarChart();
 	}
 	
 	private void onTimePeriodTypeChoiceBoxSelectionChanged(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
@@ -180,7 +176,7 @@ public class MainWindowController {
 				alert.setContentText("Error al cargar MP. Por favor, revise que haya seleccionado el archivo correcto.");
 			}
 			alert.showAndWait();
-			displayLineChart();
+			displayBarChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar MP");
@@ -213,7 +209,7 @@ public class MainWindowController {
 				alert.setContentText("Error al cargar compras de MP. Por favor, revise que haya seleccionado el archivo correcto.");
 			}
 			alert.showAndWait();
-			displayLineChart();
+			displayBarChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar compras MP");
@@ -247,7 +243,7 @@ public class MainWindowController {
 				alert.setContentText("Error al cargar PT. Por favor, revise que haya seleccionado el archivo correcto.");
 			}
 			alert.showAndWait();
-			displayLineChart();
+			displayBarChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar PT");
@@ -281,7 +277,7 @@ public class MainWindowController {
 				alert.setContentText("Error al cargar pedidos PT. Por favor, revise que haya seleccionado el archivo correcto.");
 			}
 			alert.showAndWait();
-			displayLineChart();
+			displayBarChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar pedidos PT");
@@ -315,7 +311,7 @@ public class MainWindowController {
 				alert.setContentText("Error al cargar Inventarios. Por favor, revise que haya seleccionado el archivo correcto.");
 			}
 			alert.showAndWait();
-			displayLineChart();
+			displayBarChart();
 		} catch (Exception e) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			alert.setTitle("Error al cargar Inventarios");
@@ -455,7 +451,7 @@ public class MainWindowController {
 	////////////////////////////// CONTENT //////////////////////////////
 	
 	// Method to create and display the barChart
-	private void displayLineChart() {
+	public void displayBarChart() {
 		Map<LocalDate, Double> saleOrderData, purchaseOrderData, inventoryData;
 		TimePeriodType timePeriodType = timePeriodTypeChoiceBox.getValue().equals("Meses") ? TimePeriodType.MONTH : TimePeriodType.YEAR;
 		saleOrderData = statisticsService.getSaleOrderWeightByTimePeriod(timePeriodType, periodStartChoiceBox.getValue(), periodEndChoiceBox.getValue());
@@ -494,6 +490,17 @@ public class MainWindowController {
 			datasets.add(purchaseOrderSeries);
 		}
 		
+		XYChart.Series<String, Number> purchaseOrderMinusSaleOrderSeries = new XYChart.Series<>();
+		if(purchaseOrderMinusSaleOrderCheckBox.selectedProperty().get()){
+			// Create the first dataset for saleOrderPlusInventory
+			purchaseOrderMinusSaleOrderSeries.setName("Compras-Ventas");
+			
+			for (int i = 0; i < keys.size(); i++) {
+				purchaseOrderMinusSaleOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), purchaseOrderData.get(keys.get(i)) - saleOrderData.get(keys.get(i))));
+			}
+			datasets.add(purchaseOrderMinusSaleOrderSeries);
+		}
+		
 		XYChart.Series<String, Number> inventorySeries = new XYChart.Series<>();
 		if(inventoryCheckBox.selectedProperty().get()){
 			// Create the first dataset for Inventory
@@ -505,21 +512,10 @@ public class MainWindowController {
 			datasets.add(inventorySeries);
 		}
 		
-		XYChart.Series<String, Number> purchaseOrderMinusSaleOrderSeries = new XYChart.Series<>();
-		if(purchaseOrderMinusSaleOrderCheckBox.selectedProperty().get()){
-			// Create the first dataset for saleOrderPlusInventory
-			purchaseOrderMinusSaleOrderSeries.setName("Compras - Ventas");
-			
-			for (int i = 0; i < keys.size(); i++) {
-				purchaseOrderMinusSaleOrderSeries.getData().add(new XYChart.Data<>(keyStrings.get(i), purchaseOrderData.get(keys.get(i)) - saleOrderData.get(keys.get(i))));
-			}
-			datasets.add(purchaseOrderMinusSaleOrderSeries);
-		}
-		
 		XYChart.Series<String, Number> calculatedInventorySeries = new XYChart.Series<>();
 		if(calculatedInventoryCheckBox.selectedProperty().get()){
 			// Create the first dataset for calculatedInventory
-			calculatedInventorySeries.setName("Inventario Calculado");
+			calculatedInventorySeries.setName("Inv. Calculado");
 			LocalDate inventoryKey;
 			for (int i = 0; i < keys.size(); i++) {
 				inventoryKey = keys.get(i).minusMonths(1);
@@ -531,16 +527,20 @@ public class MainWindowController {
 			datasets.add(calculatedInventorySeries);
 		}
 		
+		barChart.setAnimated(true);
 		// Update the X Axis with the new keys
 		CategoryAxis xAxis = (CategoryAxis) barChart.getXAxis();
 		xAxis.getCategories().clear();
 		xAxis.getCategories().addAll(keyStrings);
+		barChart.categoryGapProperty().bind(
+				barChart.widthProperty().divide(keyStrings.size()).divide(7)
+		);
 		
 		// Add all existing datasets to the existing barChart
 		barChart.getData().addAll(datasets);
 		
 		// Add tooltips to the data points
-		DecimalFormat df = new DecimalFormat("#,###.00");
+		DecimalFormat df = new DecimalFormat("#,###");
 		
 		if(saleOrderCheckBox.selectedProperty().get()){
 			for (XYChart.Data<String, Number> data : saleOrderSeries.getData()) {
@@ -581,6 +581,8 @@ public class MainWindowController {
 				Tooltip.install(data.getNode(), tooltip);
 			}
 		}
+		
+		barChart.setAnimated(false);
 	}
 	
 	////////////////////////////// UTILS //////////////////////////////

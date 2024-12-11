@@ -66,7 +66,10 @@ public class App extends Application {
 		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("DicoStat");
+		primaryStage.setMaximized(true);
 		primaryStage.show();
+		
+		controller.displayBarChart();
 	}
 	
 	public static void main(String[] args) {

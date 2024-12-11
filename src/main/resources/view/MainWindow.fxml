@@ -53,11 +53,11 @@
       <menus>
         <Menu mnemonicParsing="false" text="Archivo">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#loadPurchaseProducts" text="Cargar MP" />
-            <MenuItem mnemonicParsing="false" onAction="#loadPurchaseOrders" text="Cargar Compras MP" />
+            <MenuItem mnemonicParsing="false" onAction="#loadPurchaseProducts" text="Cargar Pesos MP" />
+            <MenuItem mnemonicParsing="false" onAction="#loadPurchaseOrders" text="Cargar Detalle Compras MP" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" onAction="#loadSaleProducts" text="Cargar PT" />
-            <MenuItem mnemonicParsing="false" onAction="#loadSaleOrders" text="Cargar Pedidos PT" />
+            <MenuItem mnemonicParsing="false" onAction="#loadSaleProducts" text="Cargar Pesos PT" />
+            <MenuItem mnemonicParsing="false" onAction="#loadSaleOrders" text="Cargar Detalle Facturación PT" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#loadMonthInventory" text="Cargar Inventario" />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -97,7 +97,7 @@
                   <VBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label text="Seleccionar fecha final" />
-                        <DatePicker fx:id="periodEndChoiceBox" editable="false" promptText="Selecciona una fecha" />
+                        <DatePicker fx:id="periodEndChoiceBox" promptText="Selecciona una fecha" />
                      </children>
                   </VBox>
                </children>
@@ -136,17 +136,10 @@
                      </children>
                   </VBox>
                </center>
-               <top>
-                  <VBox alignment="BOTTOM_CENTER" maxWidth="-Infinity" prefHeight="30.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <Label text="Activar y desactivar gráficas visibles" />
-                     </children>
-                  </VBox>
-               </top>
             </BorderPane>
          </right>
          <center>
-            <BarChart fx:id="barChart" BorderPane.alignment="CENTER">
+            <BarChart fx:id="barChart" alternativeRowFillVisible="false" animated="false" cacheShape="false" centerShape="false" scaleShape="false" BorderPane.alignment="CENTER">
               <xAxis>
                 <CategoryAxis side="BOTTOM" />
               </xAxis>

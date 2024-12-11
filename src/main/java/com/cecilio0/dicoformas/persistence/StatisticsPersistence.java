@@ -82,7 +82,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		Workbook workbook = new XSSFWorkbook();
 		
 		Sheet sheet = workbook.createSheet("Pesos de Productos por Fecha");
-		String title = "PESO PRODUCTOS POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
+		String title = "VALOR Y PESO POR PRODUCTO POR " + (timePeriodType.equals(TimePeriodType.MONTH) ? "MES" : "AÑO");
 		
 		int columnCount = 8;
 		
@@ -97,8 +97,15 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 		dataStyle.setBorderBottom(BorderStyle.THIN);
 		dataStyle.setBorderLeft(BorderStyle.THIN);
 		
+		CellStyle dataNoDecimalStyle = workbook.createCellStyle();
+		dataNoDecimalStyle.setDataFormat(workbook.createDataFormat().getFormat("0"));
+		dataNoDecimalStyle.setBorderTop(BorderStyle.THIN);
+		dataNoDecimalStyle.setBorderRight(BorderStyle.THIN);
+		dataNoDecimalStyle.setBorderBottom(BorderStyle.THIN);
+		dataNoDecimalStyle.setBorderLeft(BorderStyle.THIN);
+		
 		CellStyle accountingStyle = workbook.createCellStyle();
-		accountingStyle.setDataFormat(workbook.createDataFormat().getFormat("#,##0.00"));
+		accountingStyle.setDataFormat(workbook.createDataFormat().getFormat("#,##0"));
 		accountingStyle.setBorderTop(BorderStyle.THIN);
 		accountingStyle.setBorderRight(BorderStyle.THIN);
 		accountingStyle.setBorderBottom(BorderStyle.THIN);
@@ -140,7 +147,7 @@ public class StatisticsPersistence implements IStatisticsPersistence {
 				
 				Cell totalWeightCell = row.createCell(7);
 				totalWeightCell.setCellFormula("E" + index + "*G" + index);
-				totalWeightCell.setCellStyle(dataStyle);
+				totalWeightCell.setCellStyle(dataNoDecimalStyle);
 			}
 		}
 		
